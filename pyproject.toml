@@ -1,49 +1,67 @@
-[tool.poetry]
-name = "my_project_name"
+[project]
+name = "intellectual-analysis"
 version = "0.1.0"
-description = ""
-authors = ["my_name"]
+description = "Intellectual analysis and data visualisation project"
 readme = "README.md"
-exclude = [ "**/tests/**", "*.test", "*.test.*", "test.*", "test" ]
+requires-python = ">=3.12"
+dependencies = [
+    "clickhouse-connect>=1.8.0",
+    "ipykernel>=7.3.0",
+    "jinja2>=3.1.6",
+    "mlflow>=3.16.0",
+    "plotly>=7.0.0",
+    "taipy>=4.1.1",
+]
 
-
-[tool.poetry.dependencies]
-python = ">=3.10,<3.12"
-jinja2 = "^3.1.5"
-ipykernel = "^6.29.5"
-taipy="4.1.0"
-plotly = "^6.3.1"
-clickhouse-connect = "^0.9.2"
-mlflow = "^2.20.3"
-
-
-[tool.poetry.group.dev-model]
-optional=true
-
-
-[tool.poetry.group.dev-model.dependencies]
-python = ">=3.10,<3.12"
-
-
-[tool.poetry.group.stage-model]
-optional=true
-
-
-[tool.poetry.group.stage-model.dependencies]
-python = ">=3.10,<3.12"
-mlflow = "^2.20.3"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "0.3.0"
-pre-commit = "3.6.2"
-notebook = ">=7.1.2"
-psutil = "^7.0.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
-
+[dependency-groups]
+dev = [
+    "ruff>=0.16.7",
+    "pre-commit>=4.6.2",
+    "psutil>=7.2.2",
+    "notebook>=7.6.2",
+    "pytest>=9.1.1",
+]
+dev-model = [
+    "mlflow>=3.16.0",
+]
 
 [tool.ruff]
-lint.extend-select = ["W", "I", "NPY"]
-lint.ignore = ["E741", "F841", "E722", "F821"]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["notebooks", ".ipynb_checkpoints"]
+
+[tool.ruff.lint]
+# E/W — pycodestyle, F — pyflakes, I — isort, B — bugbear,
+# UP — pyupgrade, N — pep8-naming, C4 — comprehensions
+select = ["E", "W", "F", "I", "B", "UP", "N", "C4", "SIM"]
+ignore = ["E501","N803", "N806"]  	# E501: длина строки — на усмотрение fromatter'а
+# N803,N806: X, X_val и гиперпарметр C допустимы не в lowercase
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N802", "N803"]  # в тестах можно CamelCase имена
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+minversion = "9.1.1"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=src",
+    "--cov-report=term-missing",
+    "--cov-report=xml",
+    "--cov-fail-under=60",
+    "-p no:cacheprovider",
+]
+markers = [
+    "smoke: быстрые проверки импорта и структуры",
+    "data: тесты схемы и распределения данных",
+    "model: тесты качества модели и метрик",
+    "invariant: инвариантные тесты (свойства, которые всегда выполняются)",
+    "slow: долгие тесты",
+]
