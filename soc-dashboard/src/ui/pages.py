@@ -78,13 +78,9 @@ main_page = """
 
 <|{queue}|table|columns=EntityId;registered_at;verdict;criticality;status;source;asset|page_size=10|on_action=on_queue_action|>
 
-<|part|render={details_open}|
----
-
-## Карточка инцидента
-
+<|{details_open}|dialog|title=Карточка инцидента|on_action=close_details|
 <|{details_text}|text|mode=pre|>
 
-<|Закрыть карточку|button|on_action=close_details|>
+<|Закрыть|button|on_action=close_details|>
 |>
 """
