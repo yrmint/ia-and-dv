@@ -4,7 +4,7 @@ from src.analytics.charts import (
     verdict_distribution,
 )
 from src.analytics.metrics import calculate_metrics
-from src.mock_data import load_mock_data
+from src.data.loader import load_data
 
 # import callbacks for taipy to find from the Markdown field
 # # noqa: F401 makes ruff ignore the unused imports
@@ -18,7 +18,7 @@ from src.ui.pages import main_page
 from taipy.gui import Gui
 
 # data
-data = load_mock_data()
+data = load_data()
 queue = data.copy()
 
 
@@ -28,9 +28,11 @@ date_from = None
 date_to = None
 
 verdict_options = [
-    "Подтвержденный инцидент",
-    "Ложное срабатывание",
-    "Не определен",
+    "Не указан",
+    "False Positive",
+    "Дубликат",
+    "Решен",
+    "Закрыт из родительской атаки"
 ]
 
 criticality_options = [

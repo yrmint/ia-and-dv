@@ -76,7 +76,7 @@ main_page = """
 
 Нажмите на строку, чтобы открыть подробности карточки.
 
-<|{queue}|table|columns=EntityId;registered_at;verdict;criticality;status;source;asset|page_size=10|on_action=on_queue_action|>
+<|{queue}|table|columns=EntityId;Создан;Тип инцидента;Критичность;Фаза реагирования;Вердикт;Ответственный;Количество инцидентов|page_size=10|on_action=on_queue_action|>
 
 <|{details_open}|dialog|title=Карточка инцидента|on_action=close_details|
 <|{details_text}|text|mode=pre|>
