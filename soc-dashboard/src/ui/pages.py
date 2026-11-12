@@ -1,86 +1,117 @@
-main_page = """
-# SOC Incident Dashboard
+import taipy.gui.builder as tgb
 
-Мониторинг и анализ зарегистрированных инцидентов
+from src.ui.callbacks import (
+    close_details,
+    on_queue_action,
+    refresh_dashboard,
+    reset_filters,
+)
 
-<|layout|columns=1 1 1|
-<|
-**Всего инцидентов**
+with tgb.Page() as main_page:
 
-<|{metric_total}|text|>
-|>
+    tgb.text("# SOC Incident Dashboard", mode="md")
+    tgb.text(
+        "Мониторинг и анализ зарегистрированных инцидентов",
+        mode="md",
+    )
 
-<|
-**В очереди**
+    with tgb.layout(columns="1 1 1"):
+        with tgb.part("card"):
+            tgb.text("**Всего инцидентов**", mode="md")
+            tgb.text("{metric_total}")
 
-<|{metric_open}|text|>
-|>
+        with tgb.part("card"):
+            tgb.text("**В очереди**", mode="md")
+            tgb.text("{metric_open}")
 
-<|
-**Критических**
+        with tgb.part("card"):
+            tgb.text("**Критических**", mode="md")
+            tgb.text("{metric_critical}")
 
-<|{metric_critical}|text|>
-|>
-|>
+    tgb.text("## Фильтры", mode="md")
 
----
+    with tgb.layout(columns="1 1 1 1"):
+        with tgb.part():
+            tgb.date(
+                "{date_from}",
+                label="Дата от",
+            )
 
-## Фильтры
+        with tgb.part():
+            tgb.date(
+                "{date_to}",
+                label="Дата до",
+            )
 
-<|layout|columns=1 1 1 1|
-<|
-Дата от
+        with tgb.part():
+            tgb.selector(
+                "{selected_verdicts}",
+                lov="{verdict_options}",
+                multiple=True,
+                dropdown=True,
+                label="Вердикт",
+            )
 
-<|{date_from}|date|>
-|>
+        with tgb.part():
+            tgb.selector(
+                "{selected_criticalities}",
+                lov="{criticality_options}",
+                multiple=True,
+                dropdown=True,
+                label="Критичность",
+            )
 
-<|
-Дата до
+    with tgb.layout(columns="1 1"):
+        tgb.button(
+            "Применить фильтры",
+            on_action=refresh_dashboard,
+        )
+        tgb.button(
+            "Сбросить фильтры",
+            on_action=reset_filters,
+        )
 
-<|{date_to}|date|>
-|>
+    tgb.text("## Аналитика", mode="md")
 
-<|
-Вердикт
+    with tgb.layout(columns="1 1"):
+        with tgb.part():
+            tgb.chart(figure="{time_chart}")
 
-<|{selected_verdicts}|selector|lov={verdict_options}|multiple|>
-|>
+        with tgb.part():
+            tgb.chart(figure="{verdict_chart}")
 
-<|
-Критичность
+    tgb.text("## Очередь инцидентов", mode="md")
+    tgb.text(
+        "Нажмите на строку, чтобы открыть подробности карточки."
+    )
 
-<|{selected_criticalities}|selector|lov={criticality_options}|multiple|>
-|>
-|>
+    tgb.table(
+        "{queue}",
+        columns=[
+            "EntityId",
+            "Создан",
+            "Тип инцидента",
+            "Критичность",
+            "Фаза реагирования",
+            "Вердикт",
+            "Ответственный",
+            "Количество инцидентов",
+        ],
+        page_size=10,
+        on_action=on_queue_action,
+    )
 
-<|Применить фильтры|button|on_action=refresh_dashboard|>
-<|Сбросить фильтры|button|on_action=reset_filters|>
+    with tgb.dialog(
+            "{details_open}",
+            title="Карточка инцидента",
+            on_action=close_details,
+    ):
+        tgb.text(
+            "{details_text}",
+            mode="pre",
+        )
 
----
-
-## Аналитика
-
-<|layout|columns=1 1|
-<|
-<|chart|figure={time_chart}|>
-|>
-
-<|
-<|chart|figure={verdict_chart}|>
-|>
-|>
-
----
-
-## Очередь инцидентов
-
-Нажмите на строку, чтобы открыть подробности карточки.
-
-<|{queue}|table|columns=EntityId;Создан;Тип инцидента;Критичность;Фаза реагирования;Вердикт;Ответственный;Количество инцидентов|page_size=10|on_action=on_queue_action|>
-
-<|{details_open}|dialog|title=Карточка инцидента|on_action=close_details|
-<|{details_text}|text|mode=pre|>
-
-<|Закрыть|button|on_action=close_details|>
-|>
-"""
+        tgb.button(
+            "Закрыть",
+            on_action=close_details,
+        )

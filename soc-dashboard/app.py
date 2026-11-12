@@ -5,15 +5,6 @@ from src.analytics.charts import (
 )
 from src.analytics.metrics import calculate_metrics
 from src.data.loader import load_data
-
-# import callbacks for taipy to find from the Markdown field
-# # noqa: F401 makes ruff ignore the unused imports
-from src.ui.callbacks import (
-    close_details,  # noqa: F401
-    on_queue_action,  # noqa: F401
-    refresh_dashboard,  # noqa: F401
-    reset_filters,  # noqa: F401
-)
 from src.ui.pages import main_page
 from taipy.gui import Gui
 
