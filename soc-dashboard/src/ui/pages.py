@@ -80,9 +80,8 @@ with tgb.Page() as main_page:
         with tgb.part():
             tgb.chart(figure="{verdict_chart}")
 
-    with tgb.layout(columns="1"):
-        with tgb.part():
-            tgb.chart(figure="{noise_chart}")
+    with tgb.layout(columns="1"), tgb.part():
+        tgb.chart(figure="{noise_chart}")
 
     tgb.text("## Очередь инцидентов", mode="md")
     tgb.text(
