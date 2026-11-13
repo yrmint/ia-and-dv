@@ -1,6 +1,7 @@
 from config import APP_TITLE
 from src.analytics.charts import (
     incidents_over_time,
+    noisy_incident_types,
     verdict_distribution,
 )
 from src.analytics.metrics import calculate_metrics
@@ -50,6 +51,7 @@ metric_critical = int(metrics["critical"])
 # plots
 time_chart = incidents_over_time(data)
 verdict_chart = verdict_distribution(data)
+noise_chart = noisy_incident_types(data)
 
 
 if __name__ == "__main__":
