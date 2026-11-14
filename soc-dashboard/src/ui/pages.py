@@ -13,7 +13,7 @@ with tgb.Page() as main_page:
             columns="1 auto",
             class_name="dashboard-header",
     ):
-        tgb.text("# SOC Incident Dashboard", mode="md")
+        tgb.text("# Инциденты SOC", mode="md")
         tgb.toggle(
             theme=True,
             class_name="relative nolabel theme-toggle",)
@@ -28,22 +28,29 @@ with tgb.Page() as main_page:
             with tgb.layout(columns="1 1 1", gap="1rem"):
                 tgb.text("**Всего инцидентов**", mode="md")
                 tgb.text("**В очереди**", mode="md")
-                tgb.text("**Критических**", mode="md")
+                tgb.text("**Критических**", mode="md", class_name="metric-critical")
 
 
             with tgb.layout(columns="1 1 1", gap="1rem"):
-                with tgb.part("card"):
-                    tgb.text("{metric_total}")
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_total}",
+                        class_name="metric-value",
+                    )
 
-                with tgb.part("card"):
-                    tgb.text("{metric_open}")
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_open}",
+                        class_name="metric-value",
+                    )
 
-                with tgb.part("card"):
-                    tgb.text("{metric_critical}")
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_critical}",
+                        class_name="metric-value metric-critical",
+                    )
 
         with tgb.part(class_name="filters-panel"):
-            tgb.text("## Фильтры", mode="md")
-
             with tgb.layout(
                     columns="1 1",
                     columns__mobile="1",

@@ -19,6 +19,15 @@
     padding: 0.5rem 1rem;
 }
 
+.metric-value {
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.metric-critical {
+    color: var(--color-error);
+}
+
 /* Filters */
 .filters-panel {
     padding: 0.5rem 1rem;
