@@ -24,7 +24,9 @@ with tgb.Page(
         }
 ) as main_page:
 
-    tgb.text("# SOC Incident Dashboard", mode="md")
+    with tgb.layout(columns="1 1"):
+        tgb.text("# SOC Incident Dashboard", mode="md")
+        tgb.toggle(theme=True, class_name="relative")
 
     with tgb.layout(
             columns="1 2",

@@ -7,6 +7,7 @@ from src.analytics.charts import (
 from src.analytics.metrics import calculate_metrics
 from src.data.loader import load_data
 from src.ui.pages import main_page
+from src.ui.themes import DARK_THEME, LIGHT_THEME
 from taipy.gui import Gui
 
 # data
@@ -56,4 +57,10 @@ noise_chart = noisy_incident_types(data)
 
 if __name__ == "__main__":
     gui = Gui(page=main_page)
-    gui.run(title=APP_TITLE, port=5000)
+    gui.run(
+        title=APP_TITLE,
+        port=5000,
+        dark_mode=True,
+        light_theme=LIGHT_THEME,
+        dark_theme=DARK_THEME,
+    )
