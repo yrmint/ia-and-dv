@@ -2,6 +2,7 @@ import pandas as pd
 
 from src.analytics.charts import (
     incidents_over_time,
+    noisy_incident_types,
     verdict_distribution,
 )
 from src.analytics.filters import apply_filters
@@ -127,6 +128,7 @@ def refresh_dashboard(state, var_name=None, var_value=None):
 
     state.time_chart = incidents_over_time(filtered)
     state.verdict_chart = verdict_distribution(filtered)
+    state.noise_chart = noisy_incident_types(filtered)
 
     state.queue = filtered.reset_index(drop=True)
 
