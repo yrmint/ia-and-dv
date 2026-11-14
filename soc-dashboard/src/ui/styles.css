@@ -1,3 +1,9 @@
+:root {
+    /* Plot colors */
+    --plot-color-default: #959595;
+    --plot-color-highlight: #D64C4C;
+}
+
 .top-layout {
     margin-bottom: 1rem;
 }
