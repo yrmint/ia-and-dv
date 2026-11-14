@@ -110,6 +110,9 @@ with tgb.Page(
         with tgb.part():
             tgb.chart(figure="{verdict_chart}")
 
+    with tgb.layout(columns="1"), tgb.part():
+        tgb.chart(figure="{noise_chart}")
+
     tgb.text("## Очередь инцидентов", mode="md")
     tgb.text(
         "Нажмите на строку, чтобы открыть подробности карточки."

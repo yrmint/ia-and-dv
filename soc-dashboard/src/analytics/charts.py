@@ -88,3 +88,110 @@ def verdict_distribution(df: pd.DataFrame):
     )
 
     return fig
+
+
+def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
+    if df.empty:
+        return px.bar(title="Нет данных")
+
+    type_col = (
+        "incident_type"
+        if "incident_type" in df.columns
+        else "Тип инцидента"
+    )
+
+    verdict_col = (
+        "verdict"
+        if "verdict" in df.columns
+        else "Вердикт"
+    )
+
+    if type_col not in df.columns or verdict_col not in df.columns:
+        return px.bar(title="Нет данных")
+
+    data = df[[type_col, verdict_col]].copy()
+
+    data[type_col] = (
+        data[type_col]
+        .fillna("Не указано")
+        .astype(str)
+    )
+
+    data[verdict_col] = (
+        data[verdict_col]
+        .fillna("Не указано")
+        .astype(str)
+    )
+
+    summary = (
+        data.groupby(type_col)
+        .agg(
+            total=(verdict_col, "size"),
+            false_positive=(
+                verdict_col,
+                lambda values: (values == "False Positive").sum(),
+            ),
+        )
+        .reset_index()
+    )
+
+    summary["other"] = (
+        summary["total"] - summary["false_positive"]
+    )
+
+    summary["fp_rate"] = (
+        summary["false_positive"]
+        / summary["total"]
+        * 100
+    ).round(1)
+
+    summary = (
+        summary.nlargest(top_n, "total")
+        .sort_values("total")
+    )
+
+    chart_data = summary.melt(
+        id_vars=[type_col, "total", "fp_rate"],
+        value_vars=["false_positive", "other"],
+        var_name="category",
+        value_name="count",
+    )
+
+    chart_data["category"] = chart_data["category"].map({
+        "false_positive": "False Positive",
+        "other": "Остальные",
+    })
+
+    fig = px.bar(
+        chart_data,
+        x="count",
+        y=type_col,
+        color="category",
+        orientation="h",
+        barmode="stack",
+        custom_data=["total", "fp_rate"],
+        title="Топ-10 типов инцидентов: поток и False Positive",
+        labels={
+            type_col: "Тип инцидента",
+            "count": "Количество карточек",
+            "category": "Вердикт",
+        },
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "%{fullData.name}: %{x}<br>"
+            "Всего карточек: %{customdata[0]}<br>"
+            "Доля False Positive: %{customdata[1]}%"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        xaxis_title="Количество карточек",
+        yaxis_title="Тип инцидента",
+        legend_title="Вердикт",
+    )
+
+    return fig
