@@ -1,3 +1,4 @@
+
 import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
@@ -7,69 +8,98 @@ from src.ui.callbacks import (
     reset_filters,
 )
 
-with tgb.Page() as main_page:
+with tgb.Page(
+        style={
+            ".intro-panel": {
+                "padding": "0.5rem 1rem",
+            },
+            ".filters-panel": {
+                "padding": "0.5rem 1rem",
+                "border": "1px solid var(--color-paper-border)",
+                "border-radius": "8px",
+            },
+            ".top-layout": {
+                "margin-bottom": "1rem",
+            },
+        }
+) as main_page:
 
     tgb.text("# SOC Incident Dashboard", mode="md")
-    tgb.text(
-        "Мониторинг и анализ зарегистрированных инцидентов",
-        mode="md",
-    )
 
-    with tgb.layout(columns="1 1 1"):
-        with tgb.part("card"):
-            tgb.text("**Всего инцидентов**", mode="md")
-            tgb.text("{metric_total}")
+    with tgb.layout(
+            columns="1 2",
+            columns__mobile="1",
+            gap="1.5rem",
+            class_name="top-layout",
+    ):
+        with tgb.part(class_name="intro-panel"):
+            # tgb.text("## Мониторинг и анализ", mode="md")
+            # tgb.text(
+            #     "Мониторинг и анализ зарегистрированных "
+            #     "инцидентов."
+            # )
 
-        with tgb.part("card"):
-            tgb.text("**В очереди**", mode="md")
-            tgb.text("{metric_open}")
+            with tgb.layout(columns="1 1 1", gap="1rem"):
+                tgb.text("**Всего инцидентов**", mode="md")
+                tgb.text("**В очереди**", mode="md")
+                tgb.text("**Критических**", mode="md")
 
-        with tgb.part("card"):
-            tgb.text("**Критических**", mode="md")
-            tgb.text("{metric_critical}")
 
-    tgb.text("## Фильтры", mode="md")
+            with tgb.layout(columns="1 1 1", gap="1rem"):
+                with tgb.part("card"):
+                    tgb.text("{metric_total}")
 
-    with tgb.layout(columns="1 1 1 1"):
-        with tgb.part():
-            tgb.date(
-                "{date_from}",
-                label="Дата от",
-            )
+                with tgb.part("card"):
+                    tgb.text("{metric_open}")
 
-        with tgb.part():
-            tgb.date(
-                "{date_to}",
-                label="Дата до",
-            )
+                with tgb.part("card"):
+                    tgb.text("{metric_critical}")
 
-        with tgb.part():
-            tgb.selector(
-                "{selected_verdicts}",
-                lov="{verdict_options}",
-                multiple=True,
-                dropdown=True,
-                label="Вердикт",
-            )
+        with tgb.part(class_name="filters-panel"):
+            tgb.text("## Фильтры", mode="md")
 
-        with tgb.part():
-            tgb.selector(
-                "{selected_criticalities}",
-                lov="{criticality_options}",
-                multiple=True,
-                dropdown=True,
-                label="Критичность",
-            )
+            with tgb.layout(
+                    columns="1 1",
+                    columns__mobile="1",
+            ):
+                tgb.date(
+                    "{date_from}",
+                    label="Дата от",
+                )
 
-    with tgb.layout(columns="1 1"):
-        tgb.button(
-            "Применить фильтры",
-            on_action=refresh_dashboard,
-        )
-        tgb.button(
-            "Сбросить фильтры",
-            on_action=reset_filters,
-        )
+                tgb.date(
+                    "{date_to}",
+                    label="Дата до",
+                )
+
+                tgb.selector(
+                    "{selected_verdicts}",
+                    lov="{verdict_options}",
+                    multiple=True,
+                    dropdown=True,
+                    label="Вердикт",
+                )
+
+                tgb.selector(
+                    "{selected_criticalities}",
+                    lov="{criticality_options}",
+                    multiple=True,
+                    dropdown=True,
+                    label="Критичность",
+                )
+
+            with tgb.layout(columns="1 1"):
+                tgb.button(
+                    "Применить фильтры",
+                    on_action=refresh_dashboard,
+                )
+
+                tgb.button(
+                    "Сбросить фильтры",
+                    on_action=reset_filters,
+                )
+
+
 
     tgb.text("## Аналитика", mode="md")
 
