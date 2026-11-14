@@ -9,67 +9,90 @@ from src.ui.callbacks import (
 
 with tgb.Page() as main_page:
 
-    tgb.text("# SOC Incident Dashboard", mode="md")
-    tgb.text(
-        "Мониторинг и анализ зарегистрированных инцидентов",
-        mode="md",
-    )
+    with tgb.layout(
+            columns="1 auto",
+            class_name="dashboard-header",
+    ):
+        tgb.text("# Инциденты SOC", mode="md")
+        tgb.toggle(
+            theme=True,
+            class_name="relative nolabel theme-toggle",)
 
-    with tgb.layout(columns="1 1 1"):
-        with tgb.part("card"):
-            tgb.text("**Всего инцидентов**", mode="md")
-            tgb.text("{metric_total}")
+    with tgb.layout(
+            columns="1 2",
+            columns__mobile="1",
+            gap="1.5rem",
+            class_name="top-layout",
+    ):
+        with tgb.part(class_name="intro-panel"):
+            with tgb.layout(columns="1 1 1", gap="1rem"):
+                tgb.text("**Всего инцидентов**", mode="md")
+                tgb.text("**В очереди**", mode="md")
+                tgb.text("**Критических**", mode="md", class_name="metric-critical")
 
-        with tgb.part("card"):
-            tgb.text("**В очереди**", mode="md")
-            tgb.text("{metric_open}")
 
-        with tgb.part("card"):
-            tgb.text("**Критических**", mode="md")
-            tgb.text("{metric_critical}")
+            with tgb.layout(columns="1 1 1", gap="1rem"):
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_total}",
+                        class_name="metric-value",
+                    )
 
-    tgb.text("## Фильтры", mode="md")
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_open}",
+                        class_name="metric-value",
+                    )
 
-    with tgb.layout(columns="1 1 1 1"):
-        with tgb.part():
-            tgb.date(
-                "{date_from}",
-                label="Дата от",
-            )
+                # with tgb.part("card"):
+                    tgb.text(
+                        "{metric_critical}",
+                        class_name="metric-value metric-critical",
+                    )
 
-        with tgb.part():
-            tgb.date(
-                "{date_to}",
-                label="Дата до",
-            )
+        with tgb.part(class_name="filters-panel"):
+            with tgb.layout(
+                    columns="1 1",
+                    columns__mobile="1",
+            ):
+                tgb.date(
+                    "{date_from}",
+                    label="Дата от",
+                )
 
-        with tgb.part():
-            tgb.selector(
-                "{selected_verdicts}",
-                lov="{verdict_options}",
-                multiple=True,
-                dropdown=True,
-                label="Вердикт",
-            )
+                tgb.date(
+                    "{date_to}",
+                    label="Дата до",
+                )
 
-        with tgb.part():
-            tgb.selector(
-                "{selected_criticalities}",
-                lov="{criticality_options}",
-                multiple=True,
-                dropdown=True,
-                label="Критичность",
-            )
+                tgb.selector(
+                    "{selected_verdicts}",
+                    lov="{verdict_options}",
+                    multiple=True,
+                    dropdown=True,
+                    label="Вердикт",
+                )
 
-    with tgb.layout(columns="1 1"):
-        tgb.button(
-            "Применить фильтры",
-            on_action=refresh_dashboard,
-        )
-        tgb.button(
-            "Сбросить фильтры",
-            on_action=reset_filters,
-        )
+                tgb.selector(
+                    "{selected_criticalities}",
+                    lov="{criticality_options}",
+                    multiple=True,
+                    dropdown=True,
+                    label="Критичность",
+                )
+
+            with tgb.layout(columns="1 1"):
+                tgb.button(
+                    "Применить фильтры",
+                    on_action=refresh_dashboard,
+                )
+
+                tgb.button(
+                    "Сбросить фильтры",
+                    on_action=reset_filters,
+                )
+
+
 
     tgb.text("## Аналитика", mode="md")
 

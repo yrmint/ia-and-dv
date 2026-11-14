@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.express as px
+from src.ui.plot_styles import get_plot_colors
 
 
 def incidents_over_time(df: pd.DataFrame):
@@ -47,6 +48,10 @@ def incidents_over_time(df: pd.DataFrame):
         },
     )
 
+    colors = get_plot_colors()
+    # looks stupid maybe there's a better way to do it?
+    fig['data'][0]['line']['color'] = colors["default"]
+
     fig.update_layout(
         xaxis_title=x_label,
         yaxis_title="Количество инцидентов",
@@ -70,11 +75,14 @@ def verdict_distribution(df: pd.DataFrame):
         .sort_values("count", ascending=True)
     )
 
+    colors = get_plot_colors()
+
     fig = px.bar(
         grouped,
         x="count",
         y="verdict",
         orientation="h",
+        color_discrete_sequence=[colors["default"]],
         title="Распределение по вердиктам",
         labels={
             "verdict": "Вердикт",
@@ -162,6 +170,8 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
         "other": "Остальные",
     })
 
+    colors = get_plot_colors()
+
     fig = px.bar(
         chart_data,
         x="count",
@@ -175,6 +185,10 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
             type_col: "Тип инцидента",
             "count": "Количество карточек",
             "category": "Вердикт",
+        },
+        color_discrete_map={
+            "False Positive": colors["highlight"],
+            "Остальные": colors["default"],
         },
     )
 
