@@ -1,4 +1,3 @@
-
 import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
@@ -8,25 +7,16 @@ from src.ui.callbacks import (
     reset_filters,
 )
 
-with tgb.Page(
-        style={
-            ".intro-panel": {
-                "padding": "0.5rem 1rem",
-            },
-            ".filters-panel": {
-                "padding": "0.5rem 1rem",
-                "border": "1px solid var(--color-paper-border)",
-                "border-radius": "8px",
-            },
-            ".top-layout": {
-                "margin-bottom": "1rem",
-            },
-        }
-) as main_page:
+with tgb.Page() as main_page:
 
-    with tgb.layout(columns="1 1"):
+    with tgb.layout(
+            columns="1 auto",
+            class_name="dashboard-header",
+    ):
         tgb.text("# SOC Incident Dashboard", mode="md")
-        tgb.toggle(theme=True, class_name="relative")
+        tgb.toggle(
+            theme=True,
+            class_name="relative nolabel theme-toggle",)
 
     with tgb.layout(
             columns="1 2",
@@ -35,12 +25,6 @@ with tgb.Page(
             class_name="top-layout",
     ):
         with tgb.part(class_name="intro-panel"):
-            # tgb.text("## Мониторинг и анализ", mode="md")
-            # tgb.text(
-            #     "Мониторинг и анализ зарегистрированных "
-            #     "инцидентов."
-            # )
-
             with tgb.layout(columns="1 1 1", gap="1rem"):
                 tgb.text("**Всего инцидентов**", mode="md")
                 tgb.text("**В очереди**", mode="md")

@@ -56,7 +56,10 @@ noise_chart = noisy_incident_types(data)
 
 
 if __name__ == "__main__":
-    gui = Gui(page=main_page)
+    gui = Gui(
+        page=main_page,
+        css_file="src/ui/styles.css",
+    )
     gui.run(
         title=APP_TITLE,
         port=5000,
