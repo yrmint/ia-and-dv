@@ -209,3 +209,133 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
     )
 
     return fig
+
+
+def critical_incident_types(df: pd.DataFrame, top_n: int = 10):
+    if df.empty:
+        return px.bar(title="Нет данных")
+
+    type_col = (
+        "incident_type"
+        if "incident_type" in df.columns
+        else "Тип инцидента"
+    )
+
+    criticality_col = (
+        "criticality"
+        if "criticality" in df.columns
+        else "Критичность"
+    )
+
+    if type_col not in df.columns or criticality_col not in df.columns:
+        return px.bar(title="Нет данных")
+
+    data = df[[type_col, criticality_col]].copy()
+
+    data[type_col] = (
+        data[type_col]
+        .fillna("Не указано")
+        .astype(str)
+    )
+
+    data[criticality_col] = (
+        data[criticality_col]
+        .fillna("Отсутствует")
+        .astype(str)
+    )
+
+    summary = (
+        data.groupby(type_col)
+        .agg(
+            total=(criticality_col, "size"),
+            critical=(
+                criticality_col,
+                lambda values: (values == "Критическая").sum(),
+            ),
+            high=(
+                criticality_col,
+                lambda values: (values == "Высокая").sum(),
+            ),
+        )
+        .reset_index()
+    )
+
+    summary["high_risk"] = (
+        summary["critical"] + summary["high"]
+    )
+
+    summary["other"] = (
+        summary["total"] - summary["high_risk"]
+    )
+
+    summary["high_risk_rate"] = (
+        summary["high_risk"]
+        / summary["total"]
+        * 100
+    ).round(1)
+
+    summary = (
+        summary.nlargest(top_n, "high_risk")
+        .sort_values("high_risk")
+    )
+
+    chart_data = summary.melt(
+        id_vars=[
+            type_col,
+            "total",
+            "high_risk",
+            "high_risk_rate",
+        ],
+        value_vars=[
+            "critical",
+            "high",
+            "other",
+        ],
+        var_name="category",
+        value_name="count",
+    )
+
+    chart_data["category"] = chart_data["category"].map({
+        "critical": "Критическая",
+        "high": "Высокая",
+        "other": "Остальные",
+    })
+
+    fig = px.bar(
+        chart_data,
+        x="count",
+        y=type_col,
+        color="category",
+        orientation="h",
+        barmode="stack",
+        custom_data=[
+            "total",
+            "high_risk",
+            "high_risk_rate",
+        ],
+        title="Топ-10 типов инцидентов по уровню риска",
+        labels={
+            type_col: "Тип инцидента",
+            "count": "Количество карточек",
+            "category": "Критичность",
+        },
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "%{fullData.name}: %{x}<br>"
+            "Всего карточек: %{customdata[0]}<br>"
+            "Критические + высокие: %{customdata[1]}<br>"
+            "Доля высокого риска: %{customdata[2]}%"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        xaxis_title="Количество карточек",
+        yaxis_title="Тип инцидента",
+        legend_title="Критичность",
+    )
+
+    return fig
