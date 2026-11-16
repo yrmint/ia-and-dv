@@ -209,3 +209,76 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
     )
 
     return fig
+
+
+def analyst_workload(df: pd.DataFrame, top_n: int = 15):
+    if df.empty:
+        return px.bar(title="Нет данных")
+
+    analyst_col = (
+        "analyst"
+        if "analyst" in df.columns
+        else "Ответственный"
+    )
+
+    if analyst_col not in df.columns:
+        return px.bar(title="Нет данных")
+
+    data = df[[analyst_col]].copy()
+
+    data[analyst_col] = (
+        data[analyst_col]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+        .replace("", "Не назначен")
+    )
+
+    summary = (
+        data[analyst_col]
+        .value_counts()
+        .reset_index()
+    )
+
+    summary.columns = [analyst_col, "count"]
+    summary["share"] = (
+        summary["count"] / summary["count"].sum() * 100
+    ).round(1)
+
+    summary = summary.head(top_n).copy()
+    summary = summary.sort_values("count", ascending=True)
+    summary["rank"] = range(len(summary), 0, -1)
+
+    colors = get_plot_colors()
+
+    fig = px.bar(
+        summary,
+        x="count",
+        y=analyst_col,
+        orientation="h",
+        custom_data=["share", "rank"],
+        title="Топ-15 аналитиков по количеству инцидентов",
+        labels={
+            analyst_col: "Аналитик",
+            "count": "Количество карточек",
+        },
+        color_discrete_sequence=[colors["default"]],
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "Количество карточек: %{x}<br>"
+            "Доля от общего числа: %{customdata[0]}%<br>"
+            "Место в топе: %{customdata[1]}"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        xaxis_title="Количество карточек",
+        yaxis_title="Аналитик",
+        showlegend=False,
+    )
+
+    return fig
