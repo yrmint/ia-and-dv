@@ -1,7 +1,8 @@
 :root {
     /* Plot colors */
     --plot-color-default: #959595;
-    --plot-color-highlight: #D64C4C;
+    --plot-color-orange: #d6964c;
+    --plot-color-red: #D64C4C;
 }
 
 .top-layout {
