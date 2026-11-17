@@ -80,6 +80,25 @@ def incidents_over_time(df: pd.DataFrame, days: int = 7):
     )
 
     fig.update_layout(
+        xaxis={
+            "type": "date",
+            "tickformatstops": [
+                {"dtickrange": [None, "M1"], "value": "%d %b"},
+                {"dtickrange": ["M1", "M12"], "value": "%b, %Y"},
+                {"dtickrange": ["M12", None], "value": "%Y"},
+            ],
+        },
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "Начало периода: %{x|%d.%m.%Y}<br>"
+            "Количество инцидентов: %{y}"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
         xaxis_title="Период",
         yaxis_title="Количество инцидентов",
         showlegend=False,
@@ -197,14 +216,21 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
     )
 
     fig.update_layout(
+        xaxis={
+            "type": "date",
+            "tickformatstops": [
+                {"dtickrange": [None, "M1"], "value": "%d %b"},
+                {"dtickrange": ["M1", "M12"], "value": "%b, %Y"},
+                {"dtickrange": ["M12", None], "value": "%Y"},
+            ],
+        },
+    )
+
+    fig.update_layout(
         xaxis_title="Период",
         yaxis_title="Доля нарушений SLA",
         yaxis_ticksuffix="%",
         yaxis_range=[0, 100],
-        xaxis={
-            "type": "date",
-            "tickformat": "%d.%m.%Y",
-        },
         showlegend=False,
         hovermode="x",
     )
