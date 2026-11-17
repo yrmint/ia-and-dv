@@ -3,9 +3,12 @@ import plotly.express as px
 from src.ui.plot_styles import get_plot_colors
 
 
-def incidents_over_time(df: pd.DataFrame):
+def incidents_over_time(df: pd.DataFrame, days: int = 7):
     if df.empty:
-        return px.line(title="Нет данных")
+        return px.bar(title="Нет данных")
+
+    if days not in (7, 30):
+        raise ValueError("days must be either 7 or 30")
 
     data = df.copy()
     data["registered_at"] = pd.to_datetime(
@@ -15,50 +18,222 @@ def incidents_over_time(df: pd.DataFrame):
     data = data.dropna(subset=["registered_at"])
 
     if data.empty:
-        return px.line(title="Нет данных")
+        return px.bar(title="Нет данных")
 
-    period = data["registered_at"].max() - data["registered_at"].min()
+    data["registered_at"] = data["registered_at"].dt.normalize()
 
-    if period <= pd.Timedelta(days=3):
-        freq = "h"
-        x_label = "Время"
-    elif period <= pd.Timedelta(days=90):
-        freq = "D"
-        x_label = "Дата"
-    else:
-        freq = "W"
-        x_label = "Неделя"
+    start_date = data["registered_at"].min()
+    end_date = data["registered_at"].max()
+
+    data["period_start"] = (
+            start_date
+            + (
+                    (data["registered_at"] - start_date).dt.days // days
+            ) * pd.Timedelta(days=days)
+    )
 
     grouped = (
-        data.assign(date=data["registered_at"].dt.to_period(freq).dt.start_time)
-        .groupby("date")
+        data.groupby("period_start")
         .size()
         .reset_index(name="incidents")
     )
 
-    fig = px.line(
+    period_range = pd.date_range(
+        start=start_date,
+        end=end_date,
+        freq=f"{days}D",
+    )
+
+    grouped = (
+        grouped.set_index("period_start")
+        .reindex(period_range, fill_value=0)
+        .rename_axis("period_start")
+        .reset_index()
+    )
+
+    max_incidents = grouped["incidents"].max()
+    colors = get_plot_colors()
+
+    grouped["color"] = colors["default"]
+    if max_incidents > 0:
+        grouped.loc[
+            grouped["incidents"] == max_incidents,
+            "color",
+        ] = colors["red"]
+
+
+    fig = px.bar(
         grouped,
-        x="date",
+        x="period_start",
         y="incidents",
-        markers=True,
-        title="Количество инцидентов во времени",
+        color="color",
+        color_discrete_map={
+            colors["default"]: colors["default"],
+            colors["red"]: colors["red"],
+        },
+        title=f"Количество инцидентов за каждые {days} дней",
         labels={
-            "date": x_label,
+            "period_start": "Начало периода",
             "incidents": "Количество инцидентов",
+        },
+        hover_data={"color": False},
+    )
+
+    fig.update_layout(
+        xaxis={
+            "type": "date",
+            "tickformatstops": [
+                {"dtickrange": [None, "M1"], "value": "%d %b"},
+                {"dtickrange": ["M1", "M12"], "value": "%b, %Y"},
+                {"dtickrange": ["M12", None], "value": "%Y"},
+            ],
         },
     )
 
-    colors = get_plot_colors()
-    # looks stupid maybe there's a better way to do it?
-    fig['data'][0]['line']['color'] = colors["default"]
+    fig.update_traces(
+        hovertemplate=(
+            "Начало периода: %{x|%d.%m.%Y}<br>"
+            "Количество инцидентов: %{y}"
+            "<extra></extra>"
+        )
+    )
 
     fig.update_layout(
-        xaxis_title=x_label,
+        xaxis_title="Период",
         yaxis_title="Количество инцидентов",
-        hovermode="x unified",
+        showlegend=False,
+        hovermode="x",
     )
 
     return fig
+
+
+def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
+    sla_col = "SLA просрочен (взятие в работу)"
+
+    if df.empty:
+        return px.bar(title="Нет данных")
+
+    if days not in (7, 30):
+        raise ValueError("days must be either 7 or 30")
+
+    data = df[["registered_at", sla_col]].copy()
+
+    data["registered_at"] = pd.to_datetime(
+        data["registered_at"],
+        errors="coerce",
+    )
+
+    data = data.dropna(subset=["registered_at"])
+
+    if data.empty:
+        return px.bar(title="Нет данных")
+
+    data["registered_at"] = data["registered_at"].dt.normalize()
+
+    start_date = data["registered_at"].min()
+    end_date = data["registered_at"].max()
+
+    data["period_start"] = (
+            start_date
+            + (
+                    (data["registered_at"] - start_date).dt.days // days
+            ) * pd.Timedelta(days=days)
+    )
+
+    data["sla_violated"] = data[sla_col].map({
+        True: True,
+        False: False,
+        "True": True,
+        "False": False,
+    })
+
+    known_sla = data.dropna(subset=["sla_violated"])
+
+    grouped = (
+        known_sla.groupby("period_start")["sla_violated"]
+        .agg(
+            violations="sum",
+            total="count",
+        )
+    )
+
+    period_range = pd.date_range(
+        start=start_date,
+        end=end_date,
+        freq=f"{days}D",
+    )
+
+    grouped = (
+        grouped.reindex(period_range, fill_value=0)
+        .rename_axis("period_start")
+        .reset_index()
+    )
+
+    grouped["violation_rate"] = (
+            grouped["violations"]
+            / grouped["total"].replace(0, pd.NA)
+            * 100
+    ).fillna(0)
+
+    max_rate = grouped["violation_rate"].max()
+    colors = get_plot_colors()
+
+    grouped["color"] = colors["default"]
+
+    if max_rate > 0:
+        grouped.loc[
+            grouped["violation_rate"] == max_rate,
+            "color",
+        ] = colors["red"]
+
+    fig = px.bar(
+        grouped,
+        x="period_start",
+        y="violation_rate",
+        color="color",
+        color_discrete_map={
+            colors["default"]: colors["default"],
+            colors["red"]: colors["red"],
+        },
+        title=f"Доля нарушений SLA за каждые {days} дней",
+        labels={
+            "period_start": "Начало периода",
+            "violation_rate": "Доля нарушений SLA",
+        },
+        custom_data=["violations", "total"],
+        hover_data={"color": False},
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "Начало периода: %{x|%d.%m.%Y}<br>"
+            "Доля нарушений: %{y:.1f}%<br>"
+            "Нарушений: %{customdata[0]}<br>"
+            "Всего инцидентов с известным SLA: %{customdata[1]}"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        xaxis={
+            "type": "date",
+            "tickformatstops": [
+                {"dtickrange": [None, "M1"], "value": "%d %b"},
+                {"dtickrange": ["M1", "M12"], "value": "%b, %Y"},
+                {"dtickrange": ["M12", None], "value": "%Y"},
+            ],
+        },
+        xaxis_title="Период",
+        yaxis_title="Доля нарушений SLA",
+        yaxis_ticksuffix="%",
+        yaxis_range=[0, 100],
+        showlegend=False,
+        hovermode="x",
+    )
+
+    return fig
+
 
 
 def verdict_distribution(df: pd.DataFrame):

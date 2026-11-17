@@ -10,17 +10,24 @@ def apply_filters(
 ) -> pd.DataFrame:
     result = df.copy()
 
+    # convert timestamps to UTC then remove timezone information
+    registered_at = (
+        pd.to_datetime(
+            result["registered_at"],
+            errors="coerce",
+            utc=True,
+        )
+        .dt.tz_localize(None)
+    )
+
     if date_from:
         start = pd.Timestamp(date_from)
-        result = result[
-            pd.to_datetime(result["registered_at"], errors="coerce") >= start
-            ]
+        result = result[registered_at >= start]
+        registered_at = registered_at.loc[result.index]
 
     if date_to:
         end = pd.Timestamp(date_to) + pd.Timedelta(days=1)
-        result = result[
-            pd.to_datetime(result["registered_at"], errors="coerce") < end
-            ]
+        result = result[registered_at < end]
 
     if verdicts:
         result = result[result["verdict"].isin(verdicts)]

@@ -2,6 +2,7 @@ import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
     close_details,
+    on_period_change,
     on_queue_action,
     refresh_dashboard,
     reset_filters,
@@ -95,13 +96,18 @@ with tgb.Page() as main_page:
 
 
     tgb.text("## Аналитика", mode="md")
+    tgb.toggle(
+        "{selected_period}",
+        lov=["7 дней", "30 дней"],
+        on_change=on_period_change,
+    )
 
     with tgb.layout(columns="1 1"):
         with tgb.part():
             tgb.chart(figure="{time_chart}")
 
         with tgb.part():
-            tgb.chart(figure="{verdict_chart}")
+            tgb.chart(figure="{sla_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
         tgb.chart(figure="{noise_chart}")
