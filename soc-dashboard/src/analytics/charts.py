@@ -187,7 +187,7 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
             "category": "Вердикт",
         },
         color_discrete_map={
-            "False Positive": colors["highlight"],
+            "False Positive": colors["red"],
             "Остальные": colors["default"],
         },
     )
@@ -301,6 +301,8 @@ def critical_incident_types(df: pd.DataFrame, top_n: int = 10):
         "other": "Остальные",
     })
 
+    colors = get_plot_colors()
+
     fig = px.bar(
         chart_data,
         x="count",
@@ -318,6 +320,11 @@ def critical_incident_types(df: pd.DataFrame, top_n: int = 10):
             type_col: "Тип инцидента",
             "count": "Количество карточек",
             "category": "Критичность",
+        },
+        color_discrete_map={
+            "Критическая": colors["red"],
+            "Высокая": colors["orange"],
+            "Остальные": colors["default"],
         },
     )
 
