@@ -96,8 +96,17 @@ def _build_incident_details(incident):
 
 def on_period_change(state, var_name, value):
     days = 7 if value == "7 дней" else 30
-    state.time_chart = incidents_over_time(state.data, days=days)
-    state.sla_chart = sla_violations_over_time(state.data, days=days)
+
+    filtered = apply_filters(
+        state.data,
+        state.date_from,
+        state.date_to,
+        state.selected_verdicts,
+        state.selected_criticalities,
+    )
+
+    state.time_chart = incidents_over_time(filtered, days=days)
+    state.sla_chart = sla_violations_over_time(filtered, days=days)
 
 
 def refresh_dashboard(state, var_name=None, var_value=None):
