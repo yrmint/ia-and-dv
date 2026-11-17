@@ -3,6 +3,7 @@ from src.analytics.charts import (
     critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
+    sla_violations_over_time,
     verdict_distribution,
 )
 from src.analytics.metrics import calculate_metrics
@@ -56,6 +57,7 @@ metric_critical = int(metrics["critical"])
 
 # plots
 time_chart = incidents_over_time(data)
+sla_chart = sla_violations_over_time(data)
 verdict_chart = verdict_distribution(data)
 noise_chart = noisy_incident_types(data)
 criticality_chart = critical_incident_types(data)

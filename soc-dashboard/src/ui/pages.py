@@ -2,10 +2,10 @@ import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
     close_details,
+    on_period_change,
     on_queue_action,
     refresh_dashboard,
     reset_filters,
-    on_period_change,
 )
 
 with tgb.Page() as main_page:
@@ -107,7 +107,7 @@ with tgb.Page() as main_page:
             tgb.chart(figure="{time_chart}")
 
         with tgb.part():
-            tgb.chart(figure="{verdict_chart}")
+            tgb.chart(figure="{sla_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
         tgb.chart(figure="{noise_chart}")
