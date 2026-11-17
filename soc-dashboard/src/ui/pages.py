@@ -5,6 +5,7 @@ from src.ui.callbacks import (
     on_queue_action,
     refresh_dashboard,
     reset_filters,
+    on_period_change,
 )
 
 with tgb.Page() as main_page:
@@ -95,6 +96,11 @@ with tgb.Page() as main_page:
 
 
     tgb.text("## Аналитика", mode="md")
+    tgb.toggle(
+        "{selected_period}",
+        lov=["7 дней", "30 дней"],
+        on_change=on_period_change,
+    )
 
     with tgb.layout(columns="1 1"):
         with tgb.part():

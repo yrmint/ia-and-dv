@@ -41,6 +41,7 @@ criticality_options = [
 
 selected_verdicts = []
 selected_criticalities = []
+selected_period = "7 дней"
 
 selected_incident_id = None
 details_open = False

@@ -93,6 +93,11 @@ def _build_incident_details(incident):
     return "\n\n".join(result)
 
 
+def on_period_change(state, var_name, value):
+    days = 7 if value == "7 дней" else 30
+    state.time_chart = incidents_over_time(state.data, days=days)
+
+
 def refresh_dashboard(state, var_name=None, var_value=None):
     """Update KPI, plots and queue applying filters."""
 
