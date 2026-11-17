@@ -124,14 +124,7 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
         errors="coerce",
     )
 
-    data["sla_violated"] = data[sla_col].map({
-        True: True,
-        False: False,
-        "True": True,
-        "False": False,
-    })
-
-    data = data.dropna(subset=["registered_at", "sla_violated"])
+    data = data.dropna(subset=["registered_at"])
 
     if data.empty:
         return px.bar(title="Нет данных")
@@ -148,13 +141,21 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
             ) * pd.Timedelta(days=days)
     )
 
+    data["sla_violated"] = data[sla_col].map({
+        True: True,
+        False: False,
+        "True": True,
+        "False": False,
+    })
+
+    known_sla = data.dropna(subset=["sla_violated"])
+
     grouped = (
-        data.groupby("period_start")["sla_violated"]
+        known_sla.groupby("period_start")["sla_violated"]
         .agg(
             violations="sum",
             total="count",
         )
-        .reset_index()
     )
 
     period_range = pd.date_range(
@@ -164,8 +165,7 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
     )
 
     grouped = (
-        grouped.set_index("period_start")
-        .reindex(period_range, fill_value=0)
+        grouped.reindex(period_range, fill_value=0)
         .rename_axis("period_start")
         .reset_index()
     )
@@ -210,7 +210,7 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
             "Начало периода: %{x|%d.%m.%Y}<br>"
             "Доля нарушений: %{y:.1f}%<br>"
             "Нарушений: %{customdata[0]}<br>"
-            "Всего инцидентов: %{customdata[1]}"
+            "Всего инцидентов с известным SLA: %{customdata[1]}"
             "<extra></extra>"
         )
     )
@@ -224,9 +224,6 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
                 {"dtickrange": ["M12", None], "value": "%Y"},
             ],
         },
-    )
-
-    fig.update_layout(
         xaxis_title="Период",
         yaxis_title="Доля нарушений SLA",
         yaxis_ticksuffix="%",
@@ -236,6 +233,7 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
     )
 
     return fig
+
 
 
 def verdict_distribution(df: pd.DataFrame):
