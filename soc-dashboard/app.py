@@ -12,6 +12,8 @@ from src.ui.pages import main_page
 from src.ui.themes import DARK_THEME, LIGHT_THEME
 from taipy.gui import Gui
 
+import pandas as pd
+
 # data
 data = load_data()
 queue = data.copy()
@@ -39,6 +41,8 @@ criticality_options = [
     "Низкая",
     "Отсутствует"
 ]
+
+current_date = data["Дата закрытия (факт)"].max().strftime("%d.%m.%Y %H:%M:%S")
 
 selected_verdicts = []
 selected_criticalities = []

@@ -14,10 +14,17 @@ with tgb.Page() as main_page:
             columns="1 auto",
             class_name="dashboard-header",
     ):
-        tgb.text("# Инциденты SOC", mode="md")
+        with tgb.layout(
+                columns="auto auto",
+                class_name="dashboard-title-group",
+        ):
+            tgb.text("# Инциденты SOC", mode="md")
+            tgb.text("{current_date}", class_name="current-date")
+
         tgb.toggle(
             theme=True,
-            class_name="relative nolabel theme-toggle",)
+            class_name="relative nolabel theme-toggle",
+        )
 
     with tgb.layout(
             columns="1 2",
@@ -123,14 +130,12 @@ with tgb.Page() as main_page:
     tgb.table(
         "{queue}",
         columns=[
-            "EntityId",
+            "ID",
             "Создан",
             "Тип инцидента",
             "Критичность",
-            "Фаза реагирования",
             "Вердикт",
             "Ответственный",
-            "Количество инцидентов",
         ],
         page_size=10,
         on_action=on_queue_action,
