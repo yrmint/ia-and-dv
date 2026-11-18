@@ -12,8 +12,6 @@ from src.ui.pages import main_page
 from src.ui.themes import DARK_THEME, LIGHT_THEME
 from taipy.gui import Gui
 
-import pandas as pd
-
 # data
 data = load_data()
 queue = data.copy()
