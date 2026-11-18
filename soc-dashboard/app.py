@@ -40,6 +40,8 @@ criticality_options = [
     "Отсутствует"
 ]
 
+current_date = data["Дата закрытия (факт)"].max().strftime("%d.%m.%Y %H:%M:%S")
+
 selected_verdicts = []
 selected_criticalities = []
 selected_period = "7 дней"

@@ -41,7 +41,7 @@ def _build_incident_details(incident):
 
     sections = {
         "ОБЩАЯ ИНФОРМАЦИЯ": [
-            ("EntityId", "ID"),
+            ("ID", "ID"),
             ("Создан", "Дата создания"),
             ("Дата закрытия (факт)", "Дата закрытия"),
             ("Тип инцидента", "Тип инцидента"),
@@ -57,8 +57,7 @@ def _build_incident_details(incident):
             ("Прошлый ответственный", "Предыдущий аналитик"),
             ("Группа устранения", "Группа устранения"),
             ("Дата взятия в работу", "Дата взятия в работу"),
-            ("Период взятия в работу", "Период до взятия в работу"),
-            ("Время Решения", "Время решения (сек)"),
+            ("work_period", "Период до взятия в работу"),
         ],
         "ТЕХНИЧЕСКИЙ КОНТЕКСТ": [
             ("Полное имя", "Пользователь"),
@@ -135,7 +134,7 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.queue = filtered.reset_index(drop=True)
 
     if state.selected_incident_id is not None:
-        ids = state.queue["EntityId"].tolist()
+        ids = state.queue["ID"].tolist()
 
         if state.selected_incident_id not in ids:
             close_details(state)
@@ -170,7 +169,7 @@ def on_queue_action(state, var_name, payload):
 
     incident = state.queue.iloc[index]
 
-    state.selected_incident_id = incident["EntityId"]
+    state.selected_incident_id = incident["ID"]
     state.details_text = _build_incident_details(incident)
     state.details_open = True
 
