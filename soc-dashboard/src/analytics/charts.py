@@ -235,7 +235,6 @@ def sla_violations_over_time(df: pd.DataFrame, days: int = 7):
     return fig
 
 
-
 def verdict_distribution(df: pd.DataFrame):
     if df.empty:
         return px.bar(title="Нет данных")
@@ -518,6 +517,79 @@ def critical_incident_types(df: pd.DataFrame, top_n: int = 10):
         xaxis_title="Количество карточек",
         yaxis_title="Тип инцидента",
         legend_title="Критичность",
+    )
+
+    return fig
+
+
+def resolution_time_by_type(df: pd.DataFrame, top_n: int = 10):
+    resolve_col = "Время решения"
+    type_col = "Тип инцидента" if "Тип инцидента" in df.columns else "incident_type"
+
+    if df.empty or resolve_col not in df.columns or type_col not in df.columns:
+        return px.bar(title="Нет данных")
+
+    data = df[[type_col, resolve_col]].copy()
+    print("После копирования:", len(data))
+    data[type_col] = data[type_col].fillna("Не указано").astype(str)
+    data["resolve_sec"] = (data[resolve_col].where(data[resolve_col].notna()))
+    # Правое значение выбрано, потому что много инцендетов типа "Перенос файлов" имеют значения около
+    # 1.719895e+12, из-за чего график ломается. Надо что-то с этим сделать
+    data["resolve_sec"] = (data[resolve_col].where(data[resolve_col].between(0, 1580469396.7492, "right")))
+    print("Успешно преобразовано:", data["resolve_sec"].notna().sum())
+
+    if data.empty:
+        return px.bar(title="Нет данных")
+
+    summary = (
+        data.groupby(type_col)
+        .agg(
+            median_sec=("resolve_sec", "median"),
+            count=("resolve_sec", "size"),
+        )
+        .reset_index()
+    )
+
+    print("Количество типов:", len(summary))
+    print(summary.sort_values("count", ascending=False).head(20))
+
+    summary = summary[summary["count"] >= 20]
+    print("После фильтра count >= 10:", len(summary))
+    summary = summary.nlargest(top_n, "median_sec").sort_values("median_sec")
+
+    summary["median_hours"] = (summary["median_sec"] / 3600).round(1)
+
+    print(summary.sort_values("count", ascending=False).head(20))
+
+    colors = get_plot_colors()
+
+    fig = px.bar(
+        summary,
+        x="median_hours",
+        y=type_col,
+        orientation="h",
+        color_discrete_sequence=[colors["default"]],
+        custom_data=["count", "median_sec"],
+        title="Медианное время решения по типам (часы)",
+        labels={
+            type_col: "Тип инцидента",
+            "median_hours": "Медианное время, ч",
+        },
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "<b>%{y}</b><br>"
+            "Медиана: %{x:.1f} ч<br>"
+            "Карточек: %{customdata[0]}"
+            "<extra></extra>"
+        )
+    )
+
+    fig.update_layout(
+        xaxis_title="Медианное время решения, часы",
+        yaxis_title="Тип инцидента",
+        showlegend=False,
     )
 
     return fig

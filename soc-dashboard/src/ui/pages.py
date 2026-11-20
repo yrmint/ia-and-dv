@@ -32,31 +32,32 @@ with tgb.Page() as main_page:
             gap="1.5rem",
             class_name="top-layout",
     ):
-        with tgb.part(class_name="intro-panel"):
-            with tgb.layout(columns="1 1 1", gap="1rem"):
-                tgb.text("**Всего инцидентов**", mode="md")
-                tgb.text("**В очереди**", mode="md")
-                tgb.text("**Критических**", mode="md", class_name="metric-critical")
+        with tgb.layout(columns="1 1 1 1 1 1", gap="1rem", class_name="kpi-row"):
 
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("Всего", class_name="kpi-label")
+                    tgb.text("{metric_total}", class_name="kpi-value")
 
-            with tgb.layout(columns="1 1 1", gap="1rem"):
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_total}",
-                        class_name="metric-value",
-                    )
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("В очереди", class_name="kpi-label")
+                    tgb.text("{metric_open}", class_name="kpi-value")
 
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_open}",
-                        class_name="metric-value",
-                    )
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("Критических", class_name="kpi-label")
+                    tgb.text("{metric_critical}", class_name="kpi-value metric-critical")
 
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_critical}",
-                        class_name="metric-value metric-critical",
-                    )
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("Нарушения SLA", class_name="kpi-label")
+                    tgb.text("{metric_sla_rate} %", class_name="kpi-value")
+
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("Ср. время взятия", class_name="kpi-label")
+                    tgb.text("{metric_avg_take}", class_name="kpi-value")
+
+                with tgb.part(class_name="kpi-card"):
+                    tgb.text("Ср. время решения", class_name="kpi-label")
+                    tgb.text("{metric_avg_resolve}", class_name="kpi-value")
+
 
         with tgb.part(class_name="filters-panel"):
             with tgb.layout(
@@ -109,18 +110,22 @@ with tgb.Page() as main_page:
         on_change=on_period_change,
     )
 
-    with tgb.layout(columns="1 1"):
+    with tgb.layout(columns="1 1", gap="1rem"):
         with tgb.part():
             tgb.chart(figure="{time_chart}")
 
         with tgb.part():
             tgb.chart(figure="{sla_chart}")
 
-    with tgb.layout(columns="1"), tgb.part():
-        tgb.chart(figure="{noise_chart}")
+    with tgb.layout(columns="1 1", gap="1rem"):
+            with tgb.part():
+                tgb.chart(figure="{noise_chart}")
+
+            with tgb.part():
+                tgb.chart(figure="{criticality_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
-        tgb.chart(figure="{criticality_chart}")
+            tgb.chart(figure="{resolve_time_chart}")
 
     tgb.text("## Очередь инцидентов", mode="md")
     tgb.text(

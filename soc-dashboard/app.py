@@ -3,6 +3,7 @@ from src.analytics.charts import (
     critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
+    resolution_time_by_type,
     sla_violations_over_time,
     verdict_distribution,
 )
@@ -56,6 +57,11 @@ metrics = calculate_metrics(data)
 metric_total = int(metrics["total"])
 metric_open = int(metrics["open"])
 metric_critical = int(metrics["critical"])
+metric_sla_rate = metrics["sla_violation_rate"]
+metric_avg_take = metrics["avg_take_time"]
+metric_median_take = metrics["median_take_time"]
+metric_avg_resolve = metrics["avg_resolve_time"]
+metric_median_resolve = metrics["median_resolve_time"]
 
 # plots
 time_chart = incidents_over_time(data)
@@ -63,6 +69,7 @@ sla_chart = sla_violations_over_time(data)
 verdict_chart = verdict_distribution(data)
 noise_chart = noisy_incident_types(data)
 criticality_chart = critical_incident_types(data)
+resolve_time_chart = resolution_time_by_type(data)
 
 
 if __name__ == "__main__":
