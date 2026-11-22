@@ -1,6 +1,6 @@
 import taipy.gui.builder as tgb
 
-from src.ui.callbacks import toggle_filters
+from src.ui.callbacks import refresh_dashboard, reset_filters, toggle_filters
 
 with tgb.Page() as main_page:
     with tgb.layout(
@@ -48,18 +48,22 @@ with tgb.Page() as main_page:
             with tgb.layout(gap="6px"):
                 tgb.text("Критичность")
                 tgb.selector(
+                    value="{selected_criticalities}",
+                    lov="{criticality_options}",
                     multiple=True,
                 )
 
             with tgb.layout(gap="6px"):
                 tgb.text("Источник инцидента")
                 tgb.selector(
+                    value="{selected_sources}",
+                    lov="{source_options}",
                     multiple=True,
                 )
 
             with tgb.layout("1 1", gap="10px"):
-                tgb.button("Применить")
-                tgb.button("Сбросить")
+                tgb.button("Применить", on_action=refresh_dashboard,)
+                tgb.button("Сбросить", on_action=reset_filters,)
 
     # metrics
     with tgb.part("card"), tgb.layout(columns="1 1 1 1"):

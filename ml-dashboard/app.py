@@ -9,10 +9,20 @@ from taipy.gui import Gui
 predictions, incidents = load_data()
 
 current_date = datetime.now().strftime("%d.%m.%Y")
-
-filters_open = False
 date_from = None
 date_to = None
+selected_criticalities = []
+selected_sources = []
+criticality_options = (
+    sorted(predictions["Критичность"].dropna().astype(str).unique().tolist())
+    if "Критичность" in predictions.columns else []
+)
+source_options = (
+    sorted(predictions["Источник инцидента"].dropna().astype(str).unique().tolist())
+    if "Источник инцидента" in predictions.columns else []
+)
+
+filters_open = False
 
 all_metrics = calculate_metrics(predictions)
 metric_total = all_metrics["total"]
