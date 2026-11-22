@@ -10,3 +10,6 @@ INCIDENTS_PATH = DATA_DIR / "iavd_incidents_raw3_target.parquet"
 APP_TITLE = "Оценка качества ML-инференса в SOC"
 
 ID_COL = "incident_id"
+TARGET_COL = "y"
+PREDICTION_COL = "y_pred"
+VALID_LABEL_COL = "Flag_ValidLabel"

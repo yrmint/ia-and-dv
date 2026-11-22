@@ -1,7 +1,7 @@
 from pathlib import Path
-import pandas as pd
 
-from config import PREDICTIONS_PATH, INCIDENTS_PATH, ID_COL
+import pandas as pd
+from config import ID_COL, INCIDENTS_PATH, PREDICTIONS_PATH
 
 
 def _read_parquet(path: Path, required: bool = True) -> pd.DataFrame:
