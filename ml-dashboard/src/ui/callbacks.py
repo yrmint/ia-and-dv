@@ -20,6 +20,8 @@ def refresh_dashboard(state):
     state.metric_fn = m['fn']
     state.metric_fp = m['fp']
 
+    state.filters_open = False
+
 
 def reset_filters(state):
     state.date_from = None
@@ -28,3 +30,4 @@ def reset_filters(state):
     state.selected_sources = []
     refresh_dashboard(state)
 
+    state.filters_open = False
