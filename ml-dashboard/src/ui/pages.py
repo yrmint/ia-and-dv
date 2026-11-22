@@ -45,20 +45,21 @@ with tgb.Page() as main_page:
 
                 tgb.date("{date_to}", label="До")
 
-            with tgb.layout(gap="6px"):
-                tgb.text("Критичность")
+            with tgb.layout(columns="1 1", gap="6px"):
                 tgb.selector(
                     value="{selected_criticalities}",
                     lov="{criticality_options}",
                     multiple=True,
+                    dropdown=True,
+                    label="Критичность",
                 )
 
-            with tgb.layout(gap="6px"):
-                tgb.text("Источник инцидента")
                 tgb.selector(
                     value="{selected_sources}",
                     lov="{source_options}",
                     multiple=True,
+                    dropdown=True,
+                    label="Источник инцидента",
                 )
 
             with tgb.layout("1 1", gap="10px"):
