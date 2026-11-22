@@ -18,8 +18,7 @@ all_metrics = calculate_metrics(predictions)
 metric_total = all_metrics["total"]
 metric_labeled = all_metrics["labeled"]
 metric_fn = all_metrics["fn"]
-
-print(metric_total, metric_labeled, metric_fn)
+metric_fp = all_metrics["fp"]
 
 gui = Gui(page=main_page, css_file="src/ui/styles.css")
 gui.run(title=APP_TITLE, use_reloader=False)

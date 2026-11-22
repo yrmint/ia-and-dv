@@ -49,3 +49,18 @@
     font-size: 18px;
     margin-top: 12px;
 }
+
+/* metrics */
+.metric-block {
+    padding: 0.2rem 0.2rem;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.metric-danger {
+    color: var(--soc-red);
+}
