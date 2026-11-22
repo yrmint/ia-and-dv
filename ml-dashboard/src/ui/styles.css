@@ -1,0 +1,66 @@
+:root {
+    --soc-red: #C2413B;
+    --soc-muted: #64748B;
+}
+
+/* Header */
+.dashboard-header {
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-title-group {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.title-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dashboard-title-group .current-date {
+    position: relative;
+    top: 5px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.current-date, .page-subtitle, .chart-note, .footnote {
+    color: var(--soc-muted);
+}
+
+/* Filters panel */
+.filters-content {
+    padding: 24px 28px 24px 20px;
+}
+
+.dash-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.dash-text {
+    text-align: center;
+    font-size: 18px;
+    margin-top: 12px;
+}
+
+/* metrics */
+.metric-block {
+    padding: 0.2rem 0.2rem;
+}
+
+.metric-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.metric-danger {
+    color: var(--soc-red);
+}
