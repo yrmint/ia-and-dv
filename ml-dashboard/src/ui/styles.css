@@ -1,0 +1,26 @@
+:root {
+    --soc-red: #C2413B;
+    --soc-muted: #64748B;
+}
+
+.dashboard-header {
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.dashboard-title-group {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.dashboard-title-group .current-date {
+    position: relative;
+    top: 5px;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.current-date, .page-subtitle, .chart-note, .footnote {
+    color: var(--soc-muted);
+}
