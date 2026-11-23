@@ -23,8 +23,12 @@ source_options = (
 )
 
 filters_open = False
+prediction_threshold = 0.18
 
-all_metrics = calculate_metrics(predictions)
+all_metrics = calculate_metrics(
+    predictions,
+    threshold=prediction_threshold,
+)
 metric_total = all_metrics["total"]
 metric_labeled = all_metrics["labeled"]
 metric_fn = all_metrics["fn"]

@@ -13,7 +13,10 @@ def refresh_dashboard(state):
         state.selected_criticalities,
         state.selected_sources,
     )
-    m = calculate_metrics(filtered)
+    m = calculate_metrics(
+        filtered,
+        threshold=state.prediction_threshold,
+    )
 
     state.metric_total = m['total']
     state.metric_labeled = m['labeled']
@@ -29,5 +32,6 @@ def reset_filters(state):
     state.selected_criticalities = []
     state.selected_sources = []
     refresh_dashboard(state)
+    state.prediction_threshold = 0.18
 
     state.filters_open = False

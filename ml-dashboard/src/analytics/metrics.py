@@ -21,13 +21,25 @@ def _binary(series):
     return series.astype(str).str.strip().str.lower().map(mapping).astype("Int64")
 
 
-def prepare_evaluation_data(df):
+def prepare_evaluation_data(df, threshold=0.18):
     data = df.copy()
     if TARGET_COL not in data or PREDICTION_COL not in data:
         return data.iloc[0:0].copy()
 
     data["_y"] = _binary(data[TARGET_COL])
-    data["_pred"] = _binary(data[PREDICTION_COL])
+    if "y_pred_proba" in data.columns:
+        probability = pd.to_numeric(
+            data["y_pred_proba"],
+            errors="coerce",
+        )
+
+        data["_pred"] = (
+            probability.ge(threshold)
+            .where(probability.notna())
+            .astype("Int64")
+        )
+    else:
+        data["_pred"] = _binary(data[PREDICTION_COL])
 
     # If the source explicitly marks labels as invalid, exclude those rows.
     if VALID_LABEL_COL in data.columns:
@@ -44,8 +56,8 @@ def prepare_evaluation_data(df):
     return data.dropna(subset=["_y", "_pred"])
 
 
-def calculate_metrics(df):
-    evaluated = prepare_evaluation_data(df)
+def calculate_metrics(df, threshold=0.18):
+    evaluated = prepare_evaluation_data(df, threshold)
     total = len(df)
     labeled = len(evaluated)
 

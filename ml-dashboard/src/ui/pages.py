@@ -62,6 +62,20 @@ with tgb.Page() as main_page:
                     label="Источник инцидента",
                 )
 
+            with tgb.layout(gap="6px"):
+                tgb.text("Порог вероятности инцидента")
+
+                tgb.slider(
+                    "{prediction_threshold}",
+                    min=0.0,
+                    max=1.0,
+                    step=0.01,
+                    continuous=False,
+                    width="100%",
+                )
+
+                tgb.text("Текущий порог: {prediction_threshold}")
+
             with tgb.layout("1 1", gap="10px"):
                 tgb.button("Применить", on_action=refresh_dashboard,)
                 tgb.button("Сбросить", on_action=reset_filters,)
