@@ -1,3 +1,4 @@
+from src.analytics.charts import build_charts
 from src.analytics.filters import apply_filters
 from src.analytics.metrics import calculate_metrics
 
@@ -13,12 +14,22 @@ def refresh_dashboard(state):
         state.selected_criticalities,
         state.selected_sources,
     )
-    m = calculate_metrics(filtered)
+    m = calculate_metrics(
+        filtered,
+        threshold=state.prediction_threshold,
+    )
 
     state.metric_total = m['total']
     state.metric_labeled = m['labeled']
     state.metric_fn = m['fn']
     state.metric_fp = m['fp']
+
+    charts = build_charts(
+        filtered,
+        threshold=state.prediction_threshold
+    )
+
+    state.confusion_chart = charts["confusion"]
 
     state.filters_open = False
 
@@ -28,6 +39,7 @@ def reset_filters(state):
     state.date_to = None
     state.selected_criticalities = []
     state.selected_sources = []
+    state.prediction_threshold = 0.18
     refresh_dashboard(state)
 
     state.filters_open = False

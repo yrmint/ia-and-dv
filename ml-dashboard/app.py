@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from config import APP_TITLE
+from src.analytics.charts import build_charts
 from src.analytics.metrics import calculate_metrics
 from src.data.loader import load_data
 from src.ui.pages import main_page
@@ -23,12 +24,24 @@ source_options = (
 )
 
 filters_open = False
+prediction_threshold = 0.18
 
-all_metrics = calculate_metrics(predictions)
+all_metrics = calculate_metrics(
+    predictions,
+    threshold=prediction_threshold,
+)
 metric_total = all_metrics["total"]
 metric_labeled = all_metrics["labeled"]
 metric_fn = all_metrics["fn"]
 metric_fp = all_metrics["fp"]
+
+charts = build_charts(
+    predictions,
+    threshold=prediction_threshold,
+)
+
+confusion_chart = charts["confusion"]
+risk_chart = charts["risk"]
 
 gui = Gui(page=main_page, css_file="src/ui/styles.css")
 gui.run(title=APP_TITLE, use_reloader=False)

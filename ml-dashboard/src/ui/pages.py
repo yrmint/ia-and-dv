@@ -62,6 +62,20 @@ with tgb.Page() as main_page:
                     label="Источник инцидента",
                 )
 
+            with tgb.layout(gap="6px"):
+                tgb.text("Порог вероятности инцидента")
+
+                tgb.slider(
+                    "{prediction_threshold}",
+                    min=0.0,
+                    max=1.0,
+                    step=0.01,
+                    continuous=False,
+                    width="100%",
+                )
+
+                tgb.text("Текущий порог: {prediction_threshold}")
+
             with tgb.layout("1 1", gap="10px"):
                 tgb.button("Применить", on_action=refresh_dashboard,)
                 tgb.button("Сбросить", on_action=reset_filters,)
@@ -80,3 +94,10 @@ with tgb.Page() as main_page:
         with tgb.part():
             tgb.text("**Ложные тревоги**", mode="md")
             tgb.text("{metric_fp}", class_name="metric-value")
+
+    # charts
+    with tgb.layout(columns="1 1", columns__mobile="1"):
+        with tgb.part():
+            tgb.chart(figure="{confusion_chart}")
+        with tgb.part():
+            tgb.chart(figure="{risk_chart}")
