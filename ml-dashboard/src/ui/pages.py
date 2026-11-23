@@ -96,5 +96,8 @@ with tgb.Page() as main_page:
             tgb.text("{metric_fp}", class_name="metric-value")
 
     # charts
-    with tgb.layout(columns="1 1", columns__mobile="1"), tgb.part():
-        tgb.chart(figure="{confusion_chart}")
+    with tgb.layout(columns="1 1", columns__mobile="1"):
+        with tgb.part():
+            tgb.chart(figure="{confusion_chart}")
+        with tgb.part():
+            tgb.chart(figure="{risk_chart}")

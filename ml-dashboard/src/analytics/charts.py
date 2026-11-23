@@ -1,10 +1,11 @@
+import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
 
 from src.analytics.metrics import calculate_metrics
 
 PLOT_TEMPLATE = "plotly_white"
-COLORS = {"navy": "#2457A7", "red": "#C2413B", "green": "#25855A",
-          "amber": "#D18B24", "muted": "#64748B"}
+COLORS = {"default": "#959595", "red": "D64C4C", "orange": "#d6964c", "muted": "#64748B"}
 
 
 def _empty(title, message="Недостаточно данных для построения графика"):
@@ -39,6 +40,56 @@ def build_charts(df, threshold):
     else:
         confusion = _empty("Совпадение прогноза с фактической меткой")
 
+    prob = pd.to_numeric(df["y_pred_proba"], errors="coerce").dropna()
+    prob = prob[prob.between(0, 1)]
+
+    if not prob.empty:
+        threshold = 0.18
+
+        edges = np.sort(np.unique(
+            np.r_[np.linspace(0, 1, 21), threshold]
+        ))
+
+        counts, edges = np.histogram(prob, bins=edges)
+
+        centers = (edges[:-1] + edges[1:]) / 2
+        widths = np.diff(edges)
+
+        colors = [COLORS["default"] for _ in centers]
+
+        risk = go.Figure(
+            go.Bar(
+                x=centers,
+                y=counts,
+                width=widths,
+                marker={
+                    "color": colors,
+                },
+                customdata=np.column_stack((edges[:-1], edges[1:])),
+                hovertemplate=(
+                    "Интервал: %{customdata[0]:.0%}–%{customdata[1]:.0%}"
+                    "<br>Количество: %{y}"
+                    "<extra></extra>"
+                ),
+            )
+        )
+
+        risk.update_xaxes(
+            range=[0, 1],
+            tickvals=np.linspace(0, 1, 11),
+            tickformat=".0%",
+            title="Вероятность инцидента",
+        )
+        risk.update_yaxes(
+            title="Количество событий",
+            rangemode="tozero",
+        )
+
+        risk = _style(risk, "Распределение оценок вероятности инцидента")
+    else:
+        risk = _empty("Распределение оценок вероятности инцидента")
+
     return {
         "confusion": confusion,
+        "risk": risk,
     }

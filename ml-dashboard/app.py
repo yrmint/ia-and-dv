@@ -41,6 +41,7 @@ charts = build_charts(
 )
 
 confusion_chart = charts["confusion"]
+risk_chart = charts["risk"]
 
 gui = Gui(page=main_page, css_file="src/ui/styles.css")
 gui.run(title=APP_TITLE, use_reloader=False)
