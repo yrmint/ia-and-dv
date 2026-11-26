@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from src.analytics.metrics import calculate_metrics
 
 PLOT_TEMPLATE = "plotly_white"
-COLORS = {"default": "#959595", "red": "D64C4C", "orange": "#d6964c", "muted": "#64748B"}
+COLORS = {"default": "#959595", "red": "#D64C4C", "orange": "#d6964c", "muted": "#64748B"}
 
 
 def _empty(title, message="Недостаточно данных для построения графика"):
@@ -22,6 +22,104 @@ def _style(fig, title, height=330):
                       margin={"l": 25, "r": 20, "t": 55, "b": 35},
                       legend_title_text="")
     return fig
+
+
+def missed_incidents_by_type(evaluated, top_n=10):
+    """Show missed and detected real incidents grouped by incident type."""
+    title = f"Топ-{top_n} типов инцидентов по числу пропусков"
+    incident_col = "Значение Инцидента (группировка по типу)"
+
+    required = {incident_col, "_y", "_pred"}
+
+    if evaluated.empty or not required.issubset(evaluated.columns):
+        return _empty(title)
+
+    actual = evaluated.loc[
+        evaluated["_y"] == 1, [incident_col, "_pred"]
+    ].copy()
+
+    if actual.empty:
+        return _empty(title, "Нет реальных инцидентов")
+
+    actual["_type"] = (
+        actual[incident_col]
+        .astype("string")
+        .fillna("Не указан")
+        .str.strip()
+        .replace("", "Не указан")
+    )
+
+    summary = (
+        actual.groupby("_type")["_pred"]
+        .agg(total="size", tp="sum")
+        .reset_index()
+    )
+
+    summary["fn"] = summary["total"] - summary["tp"]
+    summary["fnr"] = summary["fn"] / summary["total"]
+
+    summary = (
+        summary[summary["fn"] > 0]
+        .sort_values(
+            ["fn", "total", "_type"],
+            ascending=[False, False, True],
+        )
+        .head(top_n)
+        .iloc[::-1]
+    )
+
+    if summary.empty:
+        return _empty(title, "Нет пропущенных инцидентов")
+
+    customdata = summary[
+        ["total", "fn", "tp", "fnr"]
+    ].to_numpy(dtype=float)
+
+    hover = (
+        "<b>%{y}</b>"
+        "<br>Реальных инцидентов: %{customdata[0]:.0f}"
+        "<br>Пропущено (FN): %{customdata[1]:.0f}"
+        "<br>Обнаружено (TP): %{customdata[2]:.0f}"
+        "<br>Доля пропусков: %{customdata[3]:.2%}"
+        "<extra></extra>"
+    )
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Bar(
+        y=summary["_type"],
+        x=summary["fn"],
+        name="Пропущено (FN)",
+        orientation="h",
+        marker_color=COLORS["red"],
+        customdata=customdata,
+        hovertemplate=hover,
+    ))
+
+    fig.add_trace(go.Bar(
+        y=summary["_type"],
+        x=summary["tp"],
+        name="Обнаружено (TP)",
+        orientation="h",
+        marker_color=COLORS["default"],
+        customdata=customdata,
+        hovertemplate=hover,
+    ))
+
+    fig.update_layout(barmode="stack")
+
+    fig.update_xaxes(
+        title="Количество реальных инцидентов",
+        rangemode="tozero",
+    )
+
+    fig.update_yaxes(
+        automargin=True,
+        categoryorder="array",
+        categoryarray=summary["_type"].tolist(),
+    )
+
+    return _style(fig, title, height=500)
 
 
 def build_charts(df, threshold):
@@ -92,4 +190,5 @@ def build_charts(df, threshold):
     return {
         "confusion": confusion,
         "risk": risk,
-    }
+        "missed_incidents": missed_incidents_by_type(ev),
+}
