@@ -3,6 +3,7 @@ from datetime import datetime
 from config import APP_TITLE
 from src.analytics.charts import build_charts
 from src.analytics.metrics import calculate_metrics
+from src.analytics.thresholds import build_threshold_charts
 from src.data.loader import load_data
 from src.ui.pages import main_page
 from taipy.gui import Gui
@@ -40,6 +41,13 @@ charts = build_charts(
     threshold=prediction_threshold,
 )
 
+threshold_charts = build_threshold_charts(
+    predictions,
+    threshold=prediction_threshold,
+)
+
+threshold_quality_chart = threshold_charts["quality"]
+threshold_errors_chart = threshold_charts["errors"]
 confusion_chart = charts["confusion"]
 risk_chart = charts["risk"]
 
