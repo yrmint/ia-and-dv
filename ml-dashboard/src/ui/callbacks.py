@@ -2,6 +2,7 @@
 from src.analytics.charts import build_charts
 from src.analytics.filters import apply_filters
 from src.analytics.metrics import calculate_metrics
+from src.analytics.temporal import build_temporal_charts
 from src.analytics.thresholds import build_threshold_charts
 
 
@@ -43,6 +44,15 @@ def refresh_dashboard(state):
 
     state.confusion_chart = charts["confusion"]
 
+    # Update weekly model performance charts
+    temporal_charts = build_temporal_charts(
+        filtered,
+        threshold=state.prediction_threshold,
+    )
+
+    state.temporal_quality_chart = temporal_charts["quality"]
+    state.temporal_errors_chart = temporal_charts["errors"]
+
     state.filters_open = False
 
 
@@ -52,6 +62,7 @@ def reset_filters(state):
     state.selected_criticalities = []
     state.selected_sources = []
     state.prediction_threshold = 0.18
+
     refresh_dashboard(state)
 
     state.filters_open = False
