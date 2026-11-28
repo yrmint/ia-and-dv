@@ -95,6 +95,13 @@ with tgb.Page() as main_page:
             tgb.text("**Ложные тревоги**", mode="md")
             tgb.text("{metric_fp}", class_name="metric-value")
 
+    # threshold analysis
+    with tgb.layout(columns="1 1", columns__mobile="1"):
+        with tgb.part():
+            tgb.chart(figure="{threshold_quality_chart}")
+        with tgb.part():
+            tgb.chart(figure="{threshold_errors_chart}")
+
     # charts
     with tgb.layout(columns="1 1", columns__mobile="1"):
         with tgb.part():
