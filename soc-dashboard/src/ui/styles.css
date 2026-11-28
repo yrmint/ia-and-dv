@@ -13,6 +13,7 @@
     display: flex;
     align-items: baseline;
     gap: 12px;
+	margin-bottom: 12px;
 }
 
 .dashboard-title-group .current-date {
@@ -49,4 +50,54 @@
     padding: 0.5rem 1rem;
     border: 1px solid var(--color-paper-border);
     border-radius: 8px;
+}
+
+.kpi-row {
+    margin-bottom: 1.25rem;
+}
+
+.kpi-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-paper-border);
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    text-align: center;
+}
+
+.kpi-label {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.kpi-value {
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.chart-bottom-spacing {
+    margin-bottom: 1rem;
+}
+
+.title-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-self: end;
+}
+
+.filters-content {
+    padding: 1rem 1.25rem;
+    min-width: 320px;
+}
+
+.dash-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dash-text {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
 }
