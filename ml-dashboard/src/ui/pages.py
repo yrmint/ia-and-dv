@@ -108,3 +108,6 @@ with tgb.Page() as main_page:
             tgb.chart(figure="{confusion_chart}")
         with tgb.part():
             tgb.chart(figure="{risk_chart}")
+
+    with tgb.part():
+        tgb.chart(figure="{missed_incidents_chart}")

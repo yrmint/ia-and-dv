@@ -42,6 +42,7 @@ def refresh_dashboard(state):
     state.threshold_errors_chart = threshold_charts["errors"]
 
     state.confusion_chart = charts["confusion"]
+    state.missed_incidents_chart = charts["missed_incidents"]
 
     state.filters_open = False
 
