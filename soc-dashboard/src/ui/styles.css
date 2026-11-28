@@ -1,8 +1,9 @@
 :root {
     /* Plot colors */
-    --plot-color-default: #959595;
-    --plot-color-orange: #d6964c;
-    --plot-color-red: #D64C4C;
+    --plot-color-default: #A6AFBB;
+    --plot-color-orange: #E5A34D;
+    --plot-color-red: #D95B59;
+	--plot-color-blue: #79A9FF;
 }
 
 .top-layout {
@@ -52,30 +53,55 @@
     border-radius: 8px;
 }
 
+.filters-button {
+	font-size: 1.5rem;
+}
+
+.filters-content {
+    padding: 1rem 1.25rem;
+    min-width: 320px;
+}
+
+/* KPI cards*/
 .kpi-row {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
 }
 
 .kpi-card {
     background: var(--color-paper);
     border: 1px solid var(--color-paper-border);
     border-radius: 10px;
-    padding: 0.85rem 1rem;
+
+    padding: 0.9rem 1rem;
+    min-height: 84px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
     text-align: center;
 }
 
 .kpi-label {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    line-height: 1.4;
+
     color: var(--text-secondary);
-    margin-bottom: 0.25rem;
+
+    margin-bottom: 0.35rem;
+    opacity: 1;
 }
 
 .kpi-value {
-    font-size: 1.6rem;
+    font-size: 2rem;
+	line-height: 1.2;
     font-weight: 600;
 }
 
+/* Chart panels */
 .chart-bottom-spacing {
+	min-width: 0;
+	width: 100%;
     margin-bottom: 1rem;
 }
 
@@ -84,11 +110,6 @@
     align-items: center;
     gap: 8px;
     justify-self: end;
-}
-
-.filters-content {
-    padding: 1rem 1.25rem;
-    min-width: 320px;
 }
 
 .dash-container {
@@ -100,4 +121,19 @@
 .dash-text {
     color: var(--text-secondary);
     font-size: 1.1rem;
+}
+
+/* Responsive typography */
+@media (max-width: 900px) {
+    .kpi-value {
+        font-size: 1.45rem;
+    }
+
+    .kpi-label {
+        font-size: 0.85rem;
+    }
+
+    .dashboard-title-group {
+        flex-wrap: wrap;
+    }
 }

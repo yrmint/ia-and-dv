@@ -2,7 +2,7 @@ import re
 from functools import lru_cache
 from pathlib import Path
 
-CSS_PATH = Path("src/ui/styles.css")
+CSS_PATH = Path(__file__).resolve().with_name("styles.css")
 
 
 @lru_cache(maxsize=1)
@@ -24,4 +24,5 @@ def get_plot_colors():
         "default": get_variable("--plot-color-default"),
         "red": get_variable("--plot-color-red"),
         "orange": get_variable("--plot-color-orange"),
+        "blue": get_variable("--plot-color-blue"),
     }

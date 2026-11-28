@@ -361,7 +361,7 @@ def noisy_incident_types(df: pd.DataFrame, top_n: int = 10):
             "category": "Вердикт",
         },
         color_discrete_map={
-            "False Positive": colors["red"],
+            "False Positive": colors["blue"],
             "Остальные": colors["default"],
         },
     )

@@ -4,6 +4,7 @@ from src.analytics.charts import (
     critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
+    resolution_time_by_type,
     sla_violations_over_time,
     verdict_distribution,
 )
@@ -128,6 +129,9 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.metric_total = int(metrics["total"])
     state.metric_open = int(metrics["open"])
     state.metric_critical = int(metrics["critical"])
+    state.metric_sla_rate = metrics["sla_violation_rate"]
+    state.metric_avg_take = metrics["avg_take_time"]
+    state.metric_avg_resolve = metrics["avg_resolve_time"]
 
     days = 7 if state.selected_period == "7 дней" else 30
     state.time_chart = incidents_over_time(filtered, days=days)
@@ -135,6 +139,7 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.verdict_chart = verdict_distribution(filtered)
     state.noise_chart = noisy_incident_types(filtered)
     state.criticality_chart = critical_incident_types(filtered)
+    state.resolve_time_chart = resolution_time_by_type(filtered)
 
     state.queue = filtered.reset_index(drop=True)
 

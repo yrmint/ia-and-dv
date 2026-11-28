@@ -16,10 +16,7 @@ with tgb.Page() as main_page:
             columns="1 auto",
             class_name="dashboard-header",
     ):
-        with tgb.layout(
-                columns="auto auto",
-                class_name="dashboard-title-group",
-        ):
+        with tgb.layout(columns="auto auto", class_name="dashboard-title-group"):
             tgb.text("# Инциденты SOC", mode="md")
             tgb.text("{current_date}", class_name="current-date")
 
@@ -41,7 +38,7 @@ with tgb.Page() as main_page:
     with tgb.pane(open="{filters_open}"):   # noqa: SIM117
         with tgb.layout(columns="1", class_name="filters-content", gap="16px"):
 
-            tgb.text("## Фильтры", mode="md")
+            tgb.text("## Фильтры", mode="md", class_name="filters-button")
 
             # Dates
             with tgb.layout(columns="4 1 4", gap="6px"):
@@ -74,8 +71,8 @@ with tgb.Page() as main_page:
 
     # KPI metrics
     with tgb.layout(
-        columns="1 1 1 1 1 1",
-        gap="1rem",
+        columns="1 1 1 1",
+        gap="0.75rem",
         class_name="kpi-row",
         ):
 
@@ -95,6 +92,12 @@ with tgb.Page() as main_page:
                 tgb.text("Нарушения SLA", class_name="kpi-label")
                 tgb.text("{metric_sla_rate} %", class_name="kpi-value")
 
+    with tgb.layout(
+        columns="1 1",
+        gap="0.75rem",
+        class_name="kpi-row",
+        ):
+
             with tgb.part(class_name="kpi-card"):
                 tgb.text("Ср. время взятия", class_name="kpi-label")
                 tgb.text("{metric_avg_take}", class_name="kpi-value")
@@ -103,7 +106,7 @@ with tgb.Page() as main_page:
                 tgb.text("Ср. время решения", class_name="kpi-label")
                 tgb.text("{metric_avg_resolve}", class_name="kpi-value")
 
-
+    # Charts
     tgb.text("## Аналитика", mode="md")
     tgb.toggle(
         "{selected_period}",
@@ -111,14 +114,14 @@ with tgb.Page() as main_page:
         on_change=on_period_change,
     )
 
-    with tgb.layout(columns="1 1", gap="1rem"):
+    with tgb.layout(columns="1 1", gap="1rem", columns__mobile="1"):
         with tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{time_chart}")
 
         with tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{sla_chart}")
 
-    with tgb.layout(columns="1 1", gap="1rem"):
+    with tgb.layout(columns="1 1", gap="1rem", columns__mobile="1"):
             with tgb.part(class_name="chart-bottom-spacing"):
                 tgb.chart(figure="{noise_chart}")
 
@@ -128,6 +131,7 @@ with tgb.Page() as main_page:
     with tgb.layout(columns="1"), tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{resolve_time_chart}")
 
+    # Очередь
     tgb.text("## Очередь инцидентов", mode="md")
     tgb.text(
         "Нажмите на строку, чтобы открыть подробности карточки."
