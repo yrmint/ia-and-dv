@@ -7,10 +7,12 @@ from src.ui.callbacks import (
     on_queue_action,
     refresh_dashboard,
     reset_filters,
+    toggle_filters,
 )
 
 with tgb.Page() as main_page:
 
+    # Header
     with tgb.layout(
             columns="1 auto",
             class_name="dashboard-header",
@@ -22,85 +24,85 @@ with tgb.Page() as main_page:
             tgb.text("# Инциденты SOC", mode="md")
             tgb.text("{current_date}", class_name="current-date")
 
-        tgb.toggle(
-            theme=True,
-            class_name="relative nolabel theme-toggle",
-        )
+        with tgb.layout(
+            columns="auto auto",
+            class_name="title-buttons-group",
+        ):
+            tgb.button(
+                "Фильтры",
+                on_action=toggle_filters,
+                class_name="relative nolabel",
+            )
+            tgb.toggle(
+                theme=True,
+                class_name="relative nolabel theme-toggle",
+            )
 
-    with tgb.layout(
-            columns="1 2",
-            columns__mobile="1",
-            gap="1.5rem",
-            class_name="top-layout",
-    ):
-        with tgb.part(class_name="intro-panel"):
-            with tgb.layout(columns="1 1 1", gap="1rem"):
-                tgb.text("**Всего инцидентов**", mode="md")
-                tgb.text("**В очереди**", mode="md")
-                tgb.text("**Критических**", mode="md", class_name="metric-critical")
+    # Filters slider
+    with tgb.pane(open="{filters_open}"):   # noqa: SIM117
+        with tgb.layout(columns="1", class_name="filters-content", gap="16px"):
 
+            tgb.text("## Фильтры", mode="md")
 
-            with tgb.layout(columns="1 1 1", gap="1rem"):
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_total}",
-                        class_name="metric-value",
-                    )
+            # Dates
+            with tgb.layout(columns="4 1 4", gap="6px"):
+                tgb.date("{date_from}", label="От")
+                with tgb.layout(columns="1", class_name="dash-container"):
+                    tgb.text("—", class_name="dash-text")
+                tgb.date("{date_to}", label="До")
 
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_open}",
-                        class_name="metric-value",
-                    )
-
-                # with tgb.part("card"):
-                    tgb.text(
-                        "{metric_critical}",
-                        class_name="metric-value metric-critical",
-                    )
-
-        with tgb.part(class_name="filters-panel"):
-            with tgb.layout(
-                    columns="1 1",
-                    columns__mobile="1",
-            ):
-                tgb.date(
-                    "{date_from}",
-                    label="Дата от",
-                )
-
-                tgb.date(
-                    "{date_to}",
-                    label="Дата до",
-                )
-
+            # Verdict + Сriticality
+            with tgb.layout(columns="1 1", gap="6px"):
                 tgb.selector(
-                    "{selected_verdicts}",
+                    value="{selected_verdicts}",
                     lov="{verdict_options}",
                     multiple=True,
                     dropdown=True,
                     label="Вердикт",
                 )
-
                 tgb.selector(
-                    "{selected_criticalities}",
+                    value="{selected_criticalities}",
                     lov="{criticality_options}",
                     multiple=True,
                     dropdown=True,
                     label="Критичность",
                 )
 
-            with tgb.layout(columns="1 1"):
-                tgb.button(
-                    "Применить фильтры",
-                    on_action=refresh_dashboard,
-                )
+            # Buttons
+            with tgb.layout("1 1", gap="10px"):
+                tgb.button("Применить", on_action=refresh_dashboard,)
+                tgb.button("Сбросить", on_action=reset_filters,)
 
-                tgb.button(
-                    "Сбросить фильтры",
-                    on_action=reset_filters,
-                )
+    # KPI metrics
+    with tgb.layout(
+        columns="1 1 1 1 1 1",
+        gap="1rem",
+        class_name="kpi-row",
+        ):
 
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("Всего", class_name="kpi-label")
+                tgb.text("{metric_total}", class_name="kpi-value")
+
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("В очереди", class_name="kpi-label")
+                tgb.text("{metric_open}", class_name="kpi-value")
+
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("Критических", class_name="kpi-label")
+                tgb.text("{metric_critical}", class_name="kpi-value metric-critical")
+
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("Нарушения SLA", class_name="kpi-label")
+                tgb.text("{metric_sla_rate} %", class_name="kpi-value")
+
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("Ср. время взятия", class_name="kpi-label")
+                tgb.text("{metric_avg_take}", class_name="kpi-value")
+
+            with tgb.part(class_name="kpi-card"):
+                tgb.text("Ср. время решения", class_name="kpi-label")
+                tgb.text("{metric_avg_resolve}", class_name="kpi-value")
 
 
     tgb.text("## Аналитика", mode="md")
@@ -110,18 +112,22 @@ with tgb.Page() as main_page:
         on_change=on_period_change,
     )
 
-    with tgb.layout(columns="1 1"):
-        with tgb.part():
+    with tgb.layout(columns="1 1", gap="1rem"):
+        with tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{time_chart}")
 
-        with tgb.part():
+        with tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{sla_chart}")
 
-    with tgb.layout(columns="1"), tgb.part():
-        tgb.chart(figure="{noise_chart}")
+    with tgb.layout(columns="1 1", gap="1rem"):
+            with tgb.part(class_name="chart-bottom-spacing"):
+                tgb.chart(figure="{noise_chart}")
 
-    with tgb.layout(columns="1"), tgb.part():
-        tgb.chart(figure="{criticality_chart}")
+            with tgb.part(class_name="chart-bottom-spacing"):
+                tgb.chart(figure="{criticality_chart}")
+
+    with tgb.layout(columns="1"), tgb.part(class_name="chart-bottom-spacing"):
+            tgb.chart(figure="{resolve_time_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
         tgb.chart(figure="{analyst_chart}")

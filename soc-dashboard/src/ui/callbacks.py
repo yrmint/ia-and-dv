@@ -110,6 +110,10 @@ def on_period_change(state, var_name, value):
     state.sla_chart = sla_violations_over_time(filtered, days=days)
 
 
+def toggle_filters(state):
+    state.filters_open = not state.filters_open
+
+
 def refresh_dashboard(state, var_name=None, var_value=None):
     """Update KPI, plots and queue applying filters."""
 
@@ -127,8 +131,9 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.metric_open = int(metrics["open"])
     state.metric_critical = int(metrics["critical"])
 
-    state.time_chart = incidents_over_time(filtered)
-    state.sla_chart = sla_violations_over_time(filtered)
+    days = 7 if state.selected_period == "7 дней" else 30
+    state.time_chart = incidents_over_time(filtered, days=days)
+    state.sla_chart = sla_violations_over_time(filtered, days=days)
     state.verdict_chart = verdict_distribution(filtered)
     state.noise_chart = noisy_incident_types(filtered)
     state.criticality_chart = critical_incident_types(filtered)
@@ -141,6 +146,8 @@ def refresh_dashboard(state, var_name=None, var_value=None):
 
         if state.selected_incident_id not in ids:
             close_details(state)
+
+    state.filters_open = False
 
 
 def reset_filters(state):
