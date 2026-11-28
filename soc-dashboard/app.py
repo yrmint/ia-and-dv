@@ -22,6 +22,7 @@ queue = data.copy()
 
 date_from = None
 date_to = None
+filters_open = False
 
 verdict_options = [
     "Не указан",

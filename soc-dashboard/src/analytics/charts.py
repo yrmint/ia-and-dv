@@ -530,13 +530,11 @@ def resolution_time_by_type(df: pd.DataFrame, top_n: int = 10):
         return px.bar(title="Нет данных")
 
     data = df[[type_col, resolve_col]].copy()
-    print("После копирования:", len(data))
     data[type_col] = data[type_col].fillna("Не указано").astype(str)
     data["resolve_sec"] = (data[resolve_col].where(data[resolve_col].notna()))
     # Правое значение выбрано, потому что много инцендетов типа "Перенос файлов" имеют значения около
     # 1.719895e+12, из-за чего график ломается. Надо что-то с этим сделать
     data["resolve_sec"] = (data[resolve_col].where(data[resolve_col].between(0, 1580469396.7492, "right")))
-    print("Успешно преобразовано:", data["resolve_sec"].notna().sum())
 
     if data.empty:
         return px.bar(title="Нет данных")
@@ -550,16 +548,10 @@ def resolution_time_by_type(df: pd.DataFrame, top_n: int = 10):
         .reset_index()
     )
 
-    print("Количество типов:", len(summary))
-    print(summary.sort_values("count", ascending=False).head(20))
-
     summary = summary[summary["count"] >= 20]
-    print("После фильтра count >= 10:", len(summary))
     summary = summary.nlargest(top_n, "median_sec").sort_values("median_sec")
 
     summary["median_hours"] = (summary["median_sec"] / 3600).round(1)
-
-    print(summary.sort_values("count", ascending=False).head(20))
 
     colors = get_plot_colors()
 

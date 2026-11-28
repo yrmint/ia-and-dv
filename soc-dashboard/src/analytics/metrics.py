@@ -67,7 +67,7 @@ def calculate_metrics(df: pd.DataFrame) -> dict:
     resolve_col = "Время решения"
     if resolve_col in df.columns:
         resolve_seconds = (df[resolve_col].where(df[resolve_col].notna()).div(1_000_000))
-        resolve_seconds = resolve_seconds[resolve_seconds.gt(0)]
+        resolve_seconds = resolve_seconds[resolve_seconds.between(0, 1580469396.7492, "right")]
         avg_resolve = resolve_seconds.mean()
         median_resolve = resolve_seconds.median()
     else:
