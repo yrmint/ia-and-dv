@@ -22,5 +22,6 @@ def get_plot_colors():
 
     return {
         "default": get_variable("--plot-color-default"),
-        "highlight": get_variable("--plot-color-highlight"),
+        "red": get_variable("--plot-color-red"),
+        "orange": get_variable("--plot-color-orange"),
     }

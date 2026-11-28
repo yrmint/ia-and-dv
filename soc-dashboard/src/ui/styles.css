@@ -1,16 +1,26 @@
 :root {
     /* Plot colors */
     --plot-color-default: #959595;
-    --plot-color-highlight: #D64C4C;
+    --plot-color-orange: #d6964c;
+    --plot-color-red: #D64C4C;
 }
 
 .top-layout {
     margin-bottom: 1rem;
 }
 
-/* Header layout */
-.dashboard-header {
-    align-items: center;
+.dashboard-title-group {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.dashboard-title-group .current-date {
+    position: relative;
+    top: 5px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    white-space: nowrap;
 }
 
 /* Theme toggle */

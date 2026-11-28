@@ -1,9 +1,12 @@
+
 import pandas as pd
 
 from src.analytics.charts import (
     analyst_workload,
+    critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
+    sla_violations_over_time,
     verdict_distribution,
 )
 from src.analytics.filters import apply_filters
@@ -40,7 +43,7 @@ def _build_incident_details(incident):
 
     sections = {
         "ОБЩАЯ ИНФОРМАЦИЯ": [
-            ("EntityId", "ID"),
+            ("ID", "ID"),
             ("Создан", "Дата создания"),
             ("Дата закрытия (факт)", "Дата закрытия"),
             ("Тип инцидента", "Тип инцидента"),
@@ -56,8 +59,7 @@ def _build_incident_details(incident):
             ("Прошлый ответственный", "Предыдущий аналитик"),
             ("Группа устранения", "Группа устранения"),
             ("Дата взятия в работу", "Дата взятия в работу"),
-            ("Период взятия в работу", "Период до взятия в работу"),
-            ("Время Решения", "Время решения (сек)"),
+            ("work_period", "Период до взятия в работу"),
         ],
         "ТЕХНИЧЕСКИЙ КОНТЕКСТ": [
             ("Полное имя", "Пользователь"),
@@ -93,6 +95,21 @@ def _build_incident_details(incident):
     return "\n\n".join(result)
 
 
+def on_period_change(state, var_name, value):
+    days = 7 if value == "7 дней" else 30
+
+    filtered = apply_filters(
+        state.data,
+        state.date_from,
+        state.date_to,
+        state.selected_verdicts,
+        state.selected_criticalities,
+    )
+
+    state.time_chart = incidents_over_time(filtered, days=days)
+    state.sla_chart = sla_violations_over_time(filtered, days=days)
+
+
 def refresh_dashboard(state, var_name=None, var_value=None):
     """Update KPI, plots and queue applying filters."""
 
@@ -111,14 +128,16 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.metric_critical = int(metrics["critical"])
 
     state.time_chart = incidents_over_time(filtered)
+    state.sla_chart = sla_violations_over_time(filtered)
     state.verdict_chart = verdict_distribution(filtered)
     state.noise_chart = noisy_incident_types(filtered)
+    state.criticality_chart = critical_incident_types(filtered)
     state.analyst_chart = analyst_workload(filtered)
 
     state.queue = filtered.reset_index(drop=True)
 
     if state.selected_incident_id is not None:
-        ids = state.queue["EntityId"].tolist()
+        ids = state.queue["ID"].tolist()
 
         if state.selected_incident_id not in ids:
             close_details(state)
@@ -153,7 +172,7 @@ def on_queue_action(state, var_name, payload):
 
     incident = state.queue.iloc[index]
 
-    state.selected_incident_id = incident["EntityId"]
+    state.selected_incident_id = incident["ID"]
     state.details_text = _build_incident_details(incident)
     state.details_open = True
 

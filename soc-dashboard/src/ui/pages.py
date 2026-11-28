@@ -1,7 +1,9 @@
+
 import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
     close_details,
+    on_period_change,
     on_queue_action,
     refresh_dashboard,
     reset_filters,
@@ -13,10 +15,17 @@ with tgb.Page() as main_page:
             columns="1 auto",
             class_name="dashboard-header",
     ):
-        tgb.text("# Инциденты SOC", mode="md")
+        with tgb.layout(
+                columns="auto auto",
+                class_name="dashboard-title-group",
+        ):
+            tgb.text("# Инциденты SOC", mode="md")
+            tgb.text("{current_date}", class_name="current-date")
+
         tgb.toggle(
             theme=True,
-            class_name="relative nolabel theme-toggle",)
+            class_name="relative nolabel theme-toggle",
+        )
 
     with tgb.layout(
             columns="1 2",
@@ -95,16 +104,24 @@ with tgb.Page() as main_page:
 
 
     tgb.text("## Аналитика", mode="md")
+    tgb.toggle(
+        "{selected_period}",
+        lov=["7 дней", "30 дней"],
+        on_change=on_period_change,
+    )
 
     with tgb.layout(columns="1 1"):
         with tgb.part():
             tgb.chart(figure="{time_chart}")
 
         with tgb.part():
-            tgb.chart(figure="{verdict_chart}")
+            tgb.chart(figure="{sla_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
         tgb.chart(figure="{noise_chart}")
+
+    with tgb.layout(columns="1"), tgb.part():
+        tgb.chart(figure="{criticality_chart}")
 
     with tgb.layout(columns="1"), tgb.part():
         tgb.chart(figure="{analyst_chart}")
@@ -117,14 +134,12 @@ with tgb.Page() as main_page:
     tgb.table(
         "{queue}",
         columns=[
-            "EntityId",
+            "ID",
             "Создан",
             "Тип инцидента",
             "Критичность",
-            "Фаза реагирования",
             "Вердикт",
             "Ответственный",
-            "Количество инцидентов",
         ],
         page_size=10,
         on_action=on_queue_action,

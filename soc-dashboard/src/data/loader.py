@@ -22,9 +22,33 @@ def load_data(path: str | Path = DATA_PATH) -> pd.DataFrame:
             f"В датасете отсутствуют обязательные колонки: {missing_columns}"
         )
 
-    df["Создан"] = pd.to_datetime(df["Создан"], errors="coerce")
+    df["Тип инцидента"] = (
+        df["Тип инцидента"]
+        .str.replace("~~||~~", " / ", regex=False)
+    )
+
+    df["work_period"] = (
+        pd.to_timedelta(
+            df["Период взятия в работу"],
+            unit="ms",
+        )
+        .apply(
+            lambda x: (
+                f"{x.days} дн. "
+                f"{x.seconds // 3600} ч. "
+                f"{(x.seconds % 3600) // 60} мин."
+            ) if pd.notna(x) else None
+        )
+    )
+
+    df["Количество инцидентов"] = (
+        pd.to_numeric(df["Количество инцидентов"], errors="coerce")
+        .fillna(0)
+        .astype(int)
+    )
 
     column_mapping = {
+        "ID": "EntityId",
         "registered_at": "Создан",
         "verdict": "Вердикт",
         "criticality": "Критичность",
@@ -43,6 +67,11 @@ def load_data(path: str | Path = DATA_PATH) -> pd.DataFrame:
 
     if "Алерт" in df.columns:
         df["description"] = df["description"].fillna(df["Алерт"])
+
+    df["Создан"] = (
+        pd.to_datetime(df["Создан"], utc=True)
+        .dt.strftime("%d.%m.%Y %H:%M:%S")
+    )
 
     text_columns = [
         "verdict",

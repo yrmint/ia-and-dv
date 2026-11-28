@@ -1,8 +1,11 @@
+
 from config import APP_TITLE
 from src.analytics.charts import (
     analyst_workload,
+    critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
+    sla_violations_over_time,
     verdict_distribution,
 )
 from src.analytics.metrics import calculate_metrics
@@ -39,8 +42,11 @@ criticality_options = [
     "Отсутствует"
 ]
 
+current_date = data["Дата закрытия (факт)"].max().strftime("%d.%m.%Y %H:%M:%S")
+
 selected_verdicts = []
 selected_criticalities = []
+selected_period = "7 дней"
 
 selected_incident_id = None
 details_open = False
@@ -55,8 +61,10 @@ metric_critical = int(metrics["critical"])
 
 # plots
 time_chart = incidents_over_time(data)
+sla_chart = sla_violations_over_time(data)
 verdict_chart = verdict_distribution(data)
 noise_chart = noisy_incident_types(data)
+criticality_chart = critical_incident_types(data)
 analyst_chart = analyst_workload(data)
 
 
