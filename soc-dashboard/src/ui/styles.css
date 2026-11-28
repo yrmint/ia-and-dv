@@ -65,13 +65,13 @@
 }
 
 .kpi-label {
-    font-size: 0.8rem;
+    font-size: 1.2rem;
     color: var(--text-secondary);
     margin-bottom: 0.25rem;
 }
 
 .kpi-value {
-    font-size: 1.45rem;
+    font-size: 1.6rem;
     font-weight: 600;
 }
 
