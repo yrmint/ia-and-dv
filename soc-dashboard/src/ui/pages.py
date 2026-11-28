@@ -1,3 +1,4 @@
+
 import taipy.gui.builder as tgb
 
 from src.ui.callbacks import (
@@ -127,6 +128,9 @@ with tgb.Page() as main_page:
 
     with tgb.layout(columns="1"), tgb.part(class_name="chart-bottom-spacing"):
             tgb.chart(figure="{resolve_time_chart}")
+
+    with tgb.layout(columns="1"), tgb.part():
+        tgb.chart(figure="{analyst_chart}")
 
     tgb.text("## Очередь инцидентов", mode="md")
     tgb.text(

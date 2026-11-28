@@ -1,6 +1,8 @@
+
 import pandas as pd
 
 from src.analytics.charts import (
+    analyst_workload,
     critical_incident_types,
     incidents_over_time,
     noisy_incident_types,
@@ -135,6 +137,7 @@ def refresh_dashboard(state, var_name=None, var_value=None):
     state.verdict_chart = verdict_distribution(filtered)
     state.noise_chart = noisy_incident_types(filtered)
     state.criticality_chart = critical_incident_types(filtered)
+    state.analyst_chart = analyst_workload(filtered)
 
     state.queue = filtered.reset_index(drop=True)
 
