@@ -101,3 +101,10 @@ with tgb.Page() as main_page:
             tgb.chart(figure="{confusion_chart}")
         with tgb.part():
             tgb.chart(figure="{risk_chart}")
+
+    # weekly model performance
+    with tgb.layout(columns="1", columns__mobile="1"):
+        with tgb.part():
+            tgb.chart(figure="{temporal_quality_chart}")
+        with tgb.part():
+            tgb.chart(figure="{temporal_errors_chart}")

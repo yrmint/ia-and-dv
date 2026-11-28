@@ -3,6 +3,7 @@ from datetime import datetime
 from config import APP_TITLE
 from src.analytics.charts import build_charts
 from src.analytics.metrics import calculate_metrics
+from src.analytics.temporal import build_temporal_charts
 from src.data.loader import load_data
 from src.ui.pages import main_page
 from taipy.gui import Gui
@@ -42,6 +43,15 @@ charts = build_charts(
 
 confusion_chart = charts["confusion"]
 risk_chart = charts["risk"]
+
+# Weekly model performance charts
+temporal_charts = build_temporal_charts(
+    predictions,
+    threshold=prediction_threshold,
+)
+
+temporal_quality_chart = temporal_charts["quality"]
+temporal_errors_chart = temporal_charts["errors"]
 
 gui = Gui(page=main_page, css_file="src/ui/styles.css")
 gui.run(title=APP_TITLE, use_reloader=False)
